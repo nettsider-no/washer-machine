@@ -3,6 +3,7 @@
 import { Header } from "./Header";
 import { HeroVisual } from "./HeroVisual";
 import { ContactForm } from "./ContactForm";
+import { ScrollShowcase } from "./ScrollShowcase";
 import { useLocale } from "./LocaleProvider";
 
 export function HomePage() {
@@ -39,6 +40,8 @@ export function HomePage() {
             </div>
           </div>
         </section>
+
+        <ScrollShowcase />
 
         <section
           id="services"

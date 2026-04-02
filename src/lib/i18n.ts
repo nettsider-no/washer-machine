@@ -56,6 +56,9 @@ export type Messages = {
   formError: string;
   formRequired: string;
   footerArea: string;
+  scrollShowcaseTitle: string;
+  scrollShowcaseHint: string;
+  scrollShowcaseSteps: { title: string; text: string }[];
 };
 
 export const messages: Record<Locale, Messages> = {
@@ -105,6 +108,22 @@ export const messages: Record<Locale, Messages> = {
     formError: "Noe gikk galt. Prøv igjen senere eller ring oss.",
     formRequired: "Fyll inn obligatoriske felt.",
     footerArea: "Norge",
+    scrollShowcaseTitle: "Fra støy til ro",
+    scrollShowcaseHint: "Rull ned — bildene følger deg",
+    scrollShowcaseSteps: [
+      {
+        title: "Presis diagnose",
+        text: "Vi kartlegger feilen metodisk — ikke gjettverk. Du får et klart bilde før vi bytter deler.",
+      },
+      {
+        title: "Reparasjon som varer",
+        text: "Kvalitetsdeler og ryddig montering. Målet er stabil drift, ikke bare en rask lapp.",
+      },
+      {
+        title: "Trygg hverdag",
+        text: "Når maskinen fungerer som den skal, slipper du stress og uventede avbrudd i hjemmet.",
+      },
+    ],
   },
   ru: {
     metaTitle: "Ремонт стиральных машин в Норвегии",
@@ -152,6 +171,22 @@ export const messages: Record<Locale, Messages> = {
     formError: "Ошибка отправки. Попробуйте позже или позвоните.",
     formRequired: "Заполните обязательные поля.",
     footerArea: "Норвегия",
+    scrollShowcaseTitle: "От шума к спокойствию",
+    scrollShowcaseHint: "Листайте вниз — картинки двигаются вместе со скроллом",
+    scrollShowcaseSteps: [
+      {
+        title: "Точная диагностика",
+        text: "Разбираемся с причиной системно, а не наугад. Сначала понятная картина — потом запчасти.",
+      },
+      {
+        title: "Ремонт, который держится",
+        text: "Нормальные узлы и аккуратная сборка. Цель — стабильная работа, а не «залатали и забыли».",
+      },
+      {
+        title: "Спокойный быт",
+        text: "Когда техника ведёт себя предсказуемо, меньше сюрпризов и срывов в расписании.",
+      },
+    ],
   },
   en: {
     metaTitle: "Washing machine repair in Norway",
@@ -199,5 +234,21 @@ export const messages: Record<Locale, Messages> = {
     formError: "Something went wrong. Please try again later or call us.",
     formRequired: "Please fill in the required fields.",
     footerArea: "Norway",
+    scrollShowcaseTitle: "From noise to calm",
+    scrollShowcaseHint: "Scroll — imagery moves with you",
+    scrollShowcaseSteps: [
+      {
+        title: "Precise diagnostics",
+        text: "We trace the fault methodically — no guesswork. You get clarity before any parts are replaced.",
+      },
+      {
+        title: "Repairs that hold up",
+        text: "Quality components and tidy workmanship. The goal is reliable running, not a quick patch.",
+      },
+      {
+        title: "Everyday peace of mind",
+        text: "When your washer behaves, you avoid stress and surprise breakdowns at home.",
+      },
+    ],
   },
 };
