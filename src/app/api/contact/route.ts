@@ -16,17 +16,28 @@ function escapeHtml(s: string): string {
     .replace(/>/g, "&gt;");
 }
 
+/** Trim and strip accidental quotes from Vercel / .env paste. */
+function normalizeSecret(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  const t = value.trim().replace(/^['"]+|['"]+$/g, "");
+  return t || undefined;
+}
+
+/**
+ * Telegram accepts integer or string; use string for large group ids (no JS precision loss).
+ * Supports numeric id, or @channelusername for public supergroups/channels.
+ */
+function normalizeTelegramChatId(
+  raw: string | undefined
+): string | number | undefined {
+  const s = normalizeSecret(raw);
+  if (!s) return undefined;
+  if (s.startsWith("@")) return s;
+  if (/^-?\d+$/.test(s)) return s;
+  return undefined;
+}
+
 export async function POST(request: Request) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-
-  if (!token || !chatId) {
-    return NextResponse.json(
-      { error: "Server is not configured for Telegram." },
-      { status: 503 }
-    );
-  }
-
   let body: Body;
   try {
     body = await request.json();
@@ -46,6 +57,23 @@ export async function POST(request: Request) {
 
   if (!name || !phone || !message) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  }
+
+  const token = normalizeSecret(process.env.TELEGRAM_BOT_TOKEN);
+  const chatId = normalizeTelegramChatId(process.env.TELEGRAM_CHAT_ID);
+
+  if (!token || !chatId) {
+    if (process.env.NODE_ENV === "development") {
+      console.info(
+        "[api/contact] Telegram not configured — dev mock OK. Payload:",
+        { name, phone, email: email || undefined, city: city || undefined, message }
+      );
+      return NextResponse.json({ ok: true, devMock: true });
+    }
+    return NextResponse.json(
+      { error: "Server is not configured for Telegram." },
+      { status: 503 }
+    );
   }
 
   const text = [
@@ -74,10 +102,20 @@ export async function POST(request: Request) {
     }),
   });
 
-  const tgJson = (await tgRes.json()) as { ok?: boolean; description?: string };
+  const tgJson = (await tgRes.json()) as {
+    ok?: boolean;
+    description?: string;
+    error_code?: number;
+  };
 
   if (!tgRes.ok || !tgJson.ok) {
+    const desc = tgJson.description ?? "";
     console.error("Telegram API error:", tgJson);
+    if (desc.toLowerCase().includes("chat not found")) {
+      console.error(
+        "[api/contact] Fix TELEGRAM_CHAT_ID in Vercel: open a private chat with your bot and press /start, then call getUpdates and use message.chat.id (digits only, no quotes). For groups, add the bot, send a message, use that chat id (often negative)."
+      );
+    }
     return NextResponse.json({ error: "Failed to notify" }, { status: 502 });
   }
 
