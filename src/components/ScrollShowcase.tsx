@@ -10,8 +10,9 @@ import {
 } from "framer-motion";
 import { useLocale } from "./LocaleProvider";
 
+/** Local files live in `/public` (e.g. `public/showcase-diagnostics.png` → `/showcase-diagnostics.png`). */
 const IMAGES = [
-  "https://images.unsplash.com/photo-1610557892470-55d9e80edb0f?auto=format&fit=crop&w=1400&q=80",
+  "/showcase-diagnostics.png",
   "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?auto=format&fit=crop&w=1400&q=80",
   "https://images.unsplash.com/photo-1584622650111-993a426fbf0c?auto=format&fit=crop&w=1400&q=80",
 ] as const;
@@ -36,9 +37,9 @@ export function ScrollShowcase() {
   const textOp1 = useTransform(scrollYProgress, [0.32, 0.38, 0.58, 0.68], [0, 1, 1, 0]);
   const textOp2 = useTransform(scrollYProgress, [0.6, 0.66, 0.95, 1], [0, 1, 1, 1]);
 
-  const imgOp0 = useTransform(scrollYProgress, [0, 0.34, 0.44], [1, 1, 0]);
-  const imgOp1 = useTransform(scrollYProgress, [0.34, 0.44, 0.64, 0.74], [0, 1, 1, 0]);
-  const imgOp2 = useTransform(scrollYProgress, [0.64, 0.74, 1], [0, 1, 1]);
+  const imgOp0 = useTransform(scrollYProgress, [0, 0.38, 0.5], [1, 1, 0]);
+  const imgOp1 = useTransform(scrollYProgress, [0.38, 0.48, 0.64, 0.76], [0, 1, 1, 0]);
+  const imgOp2 = useTransform(scrollYProgress, [0.64, 0.76, 1], [0, 1, 1]);
 
   const barWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
