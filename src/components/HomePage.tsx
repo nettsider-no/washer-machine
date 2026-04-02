@@ -3,7 +3,7 @@
 import { Header } from "./Header";
 import { HeroVisual } from "./HeroVisual";
 import { ContactForm } from "./ContactForm";
-import { ScrollShowcase } from "./ScrollShowcase";
+import { ServiceIcon, serviceIconAccent } from "./ServiceIcon";
 import { useLocale } from "./LocaleProvider";
 
 export function HomePage() {
@@ -41,8 +41,6 @@ export function HomePage() {
           </div>
         </section>
 
-        <ScrollShowcase />
-
         <section
           id="services"
           className="border-t border-white/10 bg-black/20 px-4 py-20 sm:px-6"
@@ -56,14 +54,21 @@ export function HomePage() {
               {t.services.map((s, i) => (
                 <li
                   key={i}
-                  className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0f2e]/80 to-[#0d1624]/80 p-6 shadow-lg shadow-black/20"
+                  className="flex gap-5 rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0f2e]/80 to-[#0d1624]/80 p-5 shadow-lg shadow-black/20 sm:gap-6 sm:p-6"
                 >
-                  <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-fuchsia-300">
-                    {s.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-400">
-                    {s.text}
-                  </p>
+                  <div
+                    className={`flex shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-black/30 p-3 sm:p-4 ${serviceIconAccent(i)} shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]`}
+                  >
+                    <ServiceIcon index={i} />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-white">
+                      {s.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+                      {s.text}
+                    </p>
+                  </div>
                 </li>
               ))}
             </ul>
