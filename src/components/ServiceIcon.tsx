@@ -59,31 +59,18 @@ export function ServiceIcon({ index }: { index: number }) {
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden
         >
+          <path
+            d="M30 6L42 18l-4 4-6-6-4 4 10 10-4 4-10-10-8 8c-4 4-10 4-14 0s-4-10 0-14l8-8-6-6 4-4 6 6 4-4-6-6 4-4z"
+            className="stroke-current"
+            strokeWidth="1.75"
+            strokeLinejoin="round"
+          />
           <circle
-            cx="22"
-            cy="22"
-            r="7"
+            cx="17"
+            cy="31"
+            r="4.5"
             className="stroke-current"
             strokeWidth="1.75"
-          />
-          <path
-            d="M27 27L38 38M38 38h-6M38 38v-6"
-            className="stroke-current"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M12 14l-3 8h6l-3-8z"
-            className="stroke-current"
-            strokeWidth="1.75"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M10 32h6"
-            className="stroke-current"
-            strokeWidth="1.75"
-            strokeLinecap="round"
           />
         </svg>
       );
