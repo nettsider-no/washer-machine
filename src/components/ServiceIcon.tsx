@@ -13,39 +13,35 @@ export function ServiceIcon({ index }: { index: number }) {
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden
         >
+          {/* Washer body + door */}
           <rect
-            x="10"
-            y="12"
-            width="22"
-            height="28"
-            rx="3"
+            x="14"
+            y="18"
+            width="20"
+            height="22"
+            rx="7"
             className="stroke-current"
-            strokeWidth="1.75"
+            strokeWidth="1.8"
           />
           <circle
-            cx="21"
-            cy="26"
+            cx="24"
+            cy="29"
             r="7"
             className="stroke-current"
-            strokeWidth="1.75"
+            strokeWidth="1.8"
           />
+          {/* Magnifier */}
           <circle
-            cx="34"
-            cy="17"
-            r="5.5"
+            cx="35"
+            cy="13"
+            r="5"
             className="stroke-current"
-            strokeWidth="1.75"
+            strokeWidth="1.8"
           />
           <path
-            d="M37 20l3 3M31 14l3 3"
+            d="M38 16l8 8"
             className="stroke-current"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-          />
-          <path
-            d="M14 40h14"
-            className="stroke-current"
-            strokeWidth="1.75"
+            strokeWidth="1.8"
             strokeLinecap="round"
           />
         </svg>
@@ -59,18 +55,25 @@ export function ServiceIcon({ index }: { index: number }) {
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden
         >
-          <path
-            d="M30 6L42 18l-4 4-6-6-4 4 10 10-4 4-10-10-8 8c-4 4-10 4-14 0s-4-10 0-14l8-8-6-6 4-4 6 6 4-4-6-6 4-4z"
+          {/* Nut */}
+          <polygon
+            points="24,12 34,18 34,30 24,36 14,30 14,18"
             className="stroke-current"
-            strokeWidth="1.75"
+            strokeWidth="1.8"
             strokeLinejoin="round"
           />
-          <circle
-            cx="17"
-            cy="31"
-            r="4.5"
+          {/* Wrench (simplified) */}
+          <path
+            d="M18 34l14-14 4 4-14 14h-4v-4z"
             className="stroke-current"
-            strokeWidth="1.75"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M30 14l4 4"
+            className="stroke-current"
+            strokeWidth="1.8"
+            strokeLinecap="round"
           />
         </svg>
       );
@@ -83,34 +86,23 @@ export function ServiceIcon({ index }: { index: number }) {
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden
         >
+          {/* Filter funnel + simple maintenance vibe */}
           <path
-            d="M16 8h16l-2 10H18L16 8z"
+            d="M16 14h16l-6 10v14l-4-2V24l-6-10z"
             className="stroke-current"
-            strokeWidth="1.75"
+            strokeWidth="1.8"
             strokeLinejoin="round"
           />
           <path
-            d="M20 18v6c0 4 2 6 4 8M28 18v6c0 4-2 6-4 8"
+            d="M20 40h8"
             className="stroke-current"
-            strokeWidth="1.75"
+            strokeWidth="1.8"
             strokeLinecap="round"
           />
           <path
-            d="M24 32v6"
+            d="M24 20l2 4"
             className="stroke-current"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-          />
-          <path
-            d="M18 40h12"
-            className="stroke-current"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-          />
-          <path
-            d="M32 12l6-4M35 15l6-4"
-            className="stroke-current"
-            strokeWidth="1.5"
+            strokeWidth="1.6"
             strokeLinecap="round"
           />
         </svg>
@@ -124,37 +116,29 @@ export function ServiceIcon({ index }: { index: number }) {
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden
         >
+          {/* Water droplet */}
           <path
-            d="M8 20h10v14H8V20zM30 16h10v18H30V16z"
+            d="M24 12c3 4 8 10 8 15a8 8 0 1 1-16 0c0-5 5-11 8-15z"
             className="stroke-current"
-            strokeWidth="1.75"
+            strokeWidth="1.8"
             strokeLinejoin="round"
           />
-          <path
-            d="M18 26h12"
+          {/* Plug / connection */}
+          <rect
+            x="16"
+            y="26"
+            width="16"
+            height="16"
+            rx="3"
             className="stroke-current"
-            strokeWidth="1.75"
-            strokeLinecap="round"
+            strokeWidth="1.8"
           />
           <path
-            d="M24 26v8"
+            d="M22 26v-7M26 26v-7"
             className="stroke-current"
-            strokeWidth="1.75"
+            strokeWidth="1.8"
             strokeLinecap="round"
           />
-          <path
-            d="M20 38h8"
-            className="stroke-current"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-          />
-          <path
-            d="M14 12c2-2 5-3 10-3s8 1 10 3"
-            className="stroke-current"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-          <circle cx="24" cy="10" r="2" className="fill-current opacity-80" />
         </svg>
       );
   }
