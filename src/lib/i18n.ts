@@ -56,6 +56,20 @@ export type Messages = {
   formError: string;
   formRequired: string;
   footerArea: string;
+  navBooking: string;
+  bookingTitle: string;
+  bookingLead: string;
+  bookingDisclaimer: string;
+  bookingDate: string;
+  bookingSlot: string;
+  bookingAddress: string;
+  bookingNote: string;
+  bookingSubmit: string;
+  bookingSending: string;
+  bookingSuccess: string;
+  bookingError: string;
+  bookingRequired: string;
+  bookingSlots: { value: string; label: string }[];
 };
 
 export const messages: Record<Locale, Messages> = {
@@ -105,6 +119,26 @@ export const messages: Record<Locale, Messages> = {
     formError: "Noe gikk galt. Prøv igjen senere eller ring oss.",
     formRequired: "Fyll inn obligatoriske felt.",
     footerArea: "Norge",
+    navBooking: "Bestill tid",
+    bookingTitle: "Bestill hjemmebesøk",
+    bookingLead:
+      "Velg ønsket dato og tidsvindu. Dette er en forespørsel — vi bekrefter tiden med deg på SMS/telefon.",
+    bookingDisclaimer:
+      "Ønsket tid er ikke endelig før du får bekreftelse fra oss.",
+    bookingDate: "Dato",
+    bookingSlot: "Tidsvindu",
+    bookingAddress: "Adresse (valgfritt)",
+    bookingNote: "Merknad (valgfritt)",
+    bookingSubmit: "Send bestilling",
+    bookingSending: "Sender…",
+    bookingSuccess: "Takk! Vi har mottatt bestillingen og tar kontakt.",
+    bookingError: "Kunne ikke sende. Prøv igjen eller ring oss.",
+    bookingRequired: "Fyll inn navn, telefon, dato og tidsvindu.",
+    bookingSlots: [
+      { value: "09-12", label: "09:00–12:00" },
+      { value: "12-15", label: "12:00–15:00" },
+      { value: "15-18", label: "15:00–18:00" },
+    ],
   },
   ru: {
     metaTitle: "Ремонт стиральных машин в Норвегии",
@@ -152,6 +186,26 @@ export const messages: Record<Locale, Messages> = {
     formError: "Ошибка отправки. Попробуйте позже или позвоните.",
     formRequired: "Заполните обязательные поля.",
     footerArea: "Норвегия",
+    navBooking: "Выезд",
+    bookingTitle: "Заявка на выезд мастера",
+    bookingLead:
+      "Выберите дату и удобное окно времени. Это заявка — точное время мы подтвердим по телефону или в мессенджере.",
+    bookingDisclaimer:
+      "Время считается согласованным только после нашего подтверждения.",
+    bookingDate: "Дата",
+    bookingSlot: "Интервал времени",
+    bookingAddress: "Адрес (необязательно)",
+    bookingNote: "Комментарий (необязательно)",
+    bookingSubmit: "Отправить заявку",
+    bookingSending: "Отправка…",
+    bookingSuccess: "Спасибо! Заявка принята — свяжемся с вами.",
+    bookingError: "Не удалось отправить. Попробуйте позже или позвоните.",
+    bookingRequired: "Укажите имя, телефон, дату и интервал.",
+    bookingSlots: [
+      { value: "09-12", label: "09:00–12:00" },
+      { value: "12-15", label: "12:00–15:00" },
+      { value: "15-18", label: "15:00–18:00" },
+    ],
   },
   en: {
     metaTitle: "Washing machine repair in Norway",
@@ -199,5 +253,25 @@ export const messages: Record<Locale, Messages> = {
     formError: "Something went wrong. Please try again later or call us.",
     formRequired: "Please fill in the required fields.",
     footerArea: "Norway",
+    navBooking: "Book visit",
+    bookingTitle: "Book a home visit",
+    bookingLead:
+      "Pick a date and time window. This is a request — we’ll confirm by phone or message.",
+    bookingDisclaimer:
+      "The slot is not final until we confirm with you.",
+    bookingDate: "Date",
+    bookingSlot: "Time window",
+    bookingAddress: "Address (optional)",
+    bookingNote: "Note (optional)",
+    bookingSubmit: "Send booking",
+    bookingSending: "Sending…",
+    bookingSuccess: "Thanks! We received your booking and will contact you.",
+    bookingError: "Could not send. Try again or call us.",
+    bookingRequired: "Please enter name, phone, date, and time window.",
+    bookingSlots: [
+      { value: "09-12", label: "09:00–12:00" },
+      { value: "12-15", label: "12:00–15:00" },
+      { value: "15-18", label: "15:00–18:00" },
+    ],
   },
 };
