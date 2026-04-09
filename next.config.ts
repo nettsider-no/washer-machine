@@ -1,11 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: [
-    "@calcom/embed-react",
-    "@calcom/embed-core",
-    "@calcom/embed-snippet",
-  ],
+  /* Cal embed uses plain iframe — no @calcom packages */
 };
 
 export default nextConfig;
