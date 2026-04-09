@@ -2,7 +2,7 @@
 
 import { Header } from "./Header";
 import { HeroVisual } from "./HeroVisual";
-import { BookingForm } from "./BookingForm";
+import { CalBooking } from "./CalBooking";
 import { ContactForm } from "./ContactForm";
 import { ServiceIcon, serviceIconAccent } from "./ServiceIcon";
 import { useLocale } from "./LocaleProvider";
@@ -86,7 +86,7 @@ export function HomePage() {
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-zinc-400">{t.bookingLead}</p>
             <div className="mt-10">
-              <BookingForm />
+              <CalBooking missingMessage={t.bookingCalMissing} />
             </div>
           </div>
         </section>

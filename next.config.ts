@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  transpilePackages: [
+    "@calcom/embed-react",
+    "@calcom/embed-core",
+    "@calcom/embed-snippet",
+  ],
 };
 
 export default nextConfig;
