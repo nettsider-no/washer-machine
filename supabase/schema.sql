@@ -41,3 +41,10 @@ create table if not exists public.tg_sessions (
 
 create index if not exists tg_sessions_expires_idx on public.tg_sessions(expires_at);
 
+-- Vercel / PostgREST notes:
+-- - In Vercel set SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (the "service_role" secret from Supabase → Project Settings → API).
+-- - Do NOT use the anon key in SUPABASE_SERVICE_ROLE_KEY (inserts will fail if RLS blocks anon).
+-- - If you enabled RLS on these tables without policies, either add policies or run:
+--   alter table public.orders disable row level security;
+--   alter table public.tg_sessions disable row level security;
+

@@ -137,6 +137,9 @@ export async function POST(request: Request) {
       { status: 503 }
     );
   }
+  const preferredWindow =
+    time === "today" || time === "tomorrow" || time === "soon" ? time : null;
+
   const { data: inserted, error: insErr } = await supabaseAdmin
     .from("orders")
     .insert({
@@ -154,7 +157,7 @@ export async function POST(request: Request) {
       model: model || null,
       issue,
       error_code: errorCode || null,
-      preferred_window: (time || null) as any,
+      preferred_window: preferredWindow,
       preferred_comment: timeComment || null,
     })
     .select("*")
@@ -162,7 +165,19 @@ export async function POST(request: Request) {
 
   if (insErr || !inserted) {
     console.error("[api/repair-request] supabase insert error", insErr);
-    return NextResponse.json({ error: "Storage error" }, { status: 502 });
+    const detail =
+      insErr?.message ??
+      (typeof insErr === "object" && insErr && "hint" in insErr
+        ? String((insErr as { hint?: string }).hint)
+        : undefined);
+    return NextResponse.json(
+      {
+        error: "Storage error",
+        detail,
+        code: (insErr as { code?: string })?.code,
+      },
+      { status: 502 }
+    );
   }
 
   // Send Telegram "card" with inline buttons

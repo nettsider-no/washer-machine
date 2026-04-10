@@ -185,9 +185,15 @@ export function RepairRequestForm() {
       const json = (await res.json().catch(() => ({}))) as {
         ok?: boolean;
         error?: string;
+        detail?: string;
+        code?: string;
       };
       if (!res.ok || !json.ok) {
-        setServerError(json.error || t.reqError);
+        const extra =
+          json.detail || json.code
+            ? ` (${[json.code, json.detail].filter(Boolean).join(": ")})`
+            : "";
+        setServerError((json.error || t.reqError) + extra);
         setSubmitState("error");
         return;
       }
