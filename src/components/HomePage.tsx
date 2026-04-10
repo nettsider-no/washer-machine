@@ -2,7 +2,6 @@
 
 import { Header } from "./Header";
 import { HeroVisual } from "./HeroVisual";
-import { ContactForm } from "./ContactForm";
 import { RepairRequestForm } from "./RepairRequestForm";
 import { ServiceIcon, serviceIconAccent } from "./ServiceIcon";
 import { useLocale } from "./LocaleProvider";
@@ -43,23 +42,6 @@ export function HomePage() {
         </section>
 
         <section
-          id="request"
-          className="border-t border-white/10 bg-black/20 px-4 py-20 sm:px-6"
-        >
-          <div className="mx-auto max-w-6xl text-center">
-            <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-wide text-white sm:text-3xl">
-              {t.requestTitle}
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-zinc-400">
-              {t.requestLead}
-            </p>
-            <div className="mt-10">
-              <RepairRequestForm />
-            </div>
-          </div>
-        </section>
-
-        <section
           id="services"
           className="border-t border-white/10 bg-black/20 px-4 py-20 sm:px-6"
         >
@@ -94,18 +76,18 @@ export function HomePage() {
         </section>
 
         <section
-          id="contact"
-          className="border-t border-white/10 px-4 py-20 sm:px-6"
+          id="request"
+          className="border-t border-white/10 bg-black/20 px-4 py-20 sm:px-6"
         >
           <div className="mx-auto max-w-6xl text-center">
             <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-wide text-white sm:text-3xl">
-              {t.contactTitle}
+              {t.requestTitle}
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-zinc-400">
-              {t.contactLead}
+            <p className="mx-auto mt-4 max-w-2xl text-zinc-400">
+              {t.requestLead}
             </p>
             <div className="mt-10">
-              <ContactForm />
+              <RepairRequestForm />
             </div>
           </div>
         </section>

@@ -17,14 +17,11 @@ export function Header() {
           WM<span className="text-fuchsia-400">.</span>SERVICE
         </a>
         <nav className="hidden items-center gap-8 text-sm text-zinc-300 md:flex">
-          <a href="#request" className="transition hover:text-cyan-300">
-            {t.navRequest}
-          </a>
           <a href="#services" className="transition hover:text-cyan-300">
             {t.navServices}
           </a>
-          <a href="#contact" className="transition hover:text-cyan-300">
-            {t.navContact}
+          <a href="#request" className="transition hover:text-cyan-300">
+            {t.navRequest}
           </a>
         </nav>
         <div
