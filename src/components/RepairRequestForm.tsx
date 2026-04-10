@@ -1,11 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { IMaskInput } from "react-imask";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle2, Loader2, Paperclip, X } from "lucide-react";
+import { CheckCircle2, Loader2, Paperclip, ShieldCheck, X } from "lucide-react";
 
 import { useLocale } from "./LocaleProvider";
 import {
@@ -28,6 +28,14 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 const BRANDS = [
@@ -53,9 +61,15 @@ export function RepairRequestForm() {
   const { t, locale } = useLocale();
   const [files, setFiles] = useState<File[]>([]);
   const [submitState, setSubmitState] = useState<
-    "idle" | "sending" | "success" | "error"
+    "idle" | "sending" | "error"
   >("idle");
   const [serverError, setServerError] = useState<string | null>(null);
+  const [successOpen, setSuccessOpen] = useState(false);
+  const startedAtRef = useRef<number>(Date.now());
+
+  useEffect(() => {
+    startedAtRef.current = Date.now();
+  }, []);
 
   const schema = useMemo(
     () =>
@@ -67,19 +81,20 @@ export function RepairRequestForm() {
           .min(1, t.reqValidationRequired)
           .refine((v) => {
             const d = digitsOnly(v);
-            return d.length >= 8 && d.length <= 15;
+            return d.length === 10 && d.startsWith("47");
           }, t.reqValidationPhone),
         address: z.string().trim().optional(),
         brand: z.string().trim().optional(),
         brandOther: z.string().trim().optional(),
         model: z.string().trim().optional(),
-        issue: z.string().trim().min(1, t.reqValidationRequired),
+        issue: z.string().trim().min(5, t.reqValidationRequired),
         errorCode: z.string().trim().optional(),
         time: z.enum(["today", "tomorrow", "soon"], {
           message: t.reqValidationRequired,
         }),
         timeComment: z.string().trim().optional(),
         website: z.string().optional(),
+        startedAt: z.string().optional(),
       }),
     [t]
   );
@@ -100,6 +115,7 @@ export function RepairRequestForm() {
       time: "soon",
       timeComment: "",
       website: "",
+      startedAt: "",
     },
     mode: "onBlur",
   });
@@ -141,7 +157,9 @@ export function RepairRequestForm() {
 
     if (values.website?.trim()) {
       // Honeypot: bots.
-      setSubmitState("success");
+      setSuccessOpen(true);
+      form.reset();
+      setFiles([]);
       return;
     }
 
@@ -160,6 +178,7 @@ export function RepairRequestForm() {
       fd.set("errorCode", values.errorCode?.trim() ?? "");
       fd.set("time", values.time);
       fd.set("timeComment", values.timeComment?.trim() ?? "");
+      fd.set("startedAt", String(startedAtRef.current));
       for (const f of files) fd.append("media", f, f.name);
 
       const res = await fetch("/api/repair-request", { method: "POST", body: fd });
@@ -173,55 +192,54 @@ export function RepairRequestForm() {
         return;
       }
 
-      setSubmitState("success");
       form.reset();
       setFiles([]);
+      startedAtRef.current = Date.now();
+      setSuccessOpen(true);
+      setSubmitState("idle");
     } catch {
       setServerError(t.reqError);
       setSubmitState("error");
     }
   }
 
-  if (submitState === "success") {
-    return (
-      <Card className="mx-auto max-w-2xl">
-        <CardContent className="p-8 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-500/10">
-            <CheckCircle2 className="h-7 w-7 text-cyan-200" />
-          </div>
-          <h3 className="mt-5 font-[family-name:var(--font-display)] text-2xl font-bold tracking-wide text-white">
-            {t.reqSuccessTitle}
-          </h3>
-          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-zinc-400">
-            {t.reqSuccessText}
-          </p>
-          <div className="mt-6 flex justify-center">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setSubmitState("idle")}
-            >
-              {t.reqSendAnother}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="mx-auto max-w-3xl">
-      <CardHeader>
-        <CardTitle>{t.requestFormTitle}</CardTitle>
-        <CardDescription>{t.requestFormHint}</CardDescription>
-      </CardHeader>
+    <>
+      <Dialog open={successOpen} onOpenChange={setSuccessOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <div className="flex items-start gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-500/10">
+                <CheckCircle2 className="h-6 w-6 text-cyan-200" />
+              </div>
+              <div className="min-w-0">
+                <DialogTitle>{t.reqSuccessTitle}</DialogTitle>
+                <DialogDescription className="mt-1">
+                  {t.reqSuccessText}
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="secondary" onClick={() => setSuccessOpen(false)}>
+              OK
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      <CardContent>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid gap-5"
-          noValidate
-        >
+      <Card className="mx-auto max-w-3xl">
+        <CardHeader>
+          <CardTitle>{t.requestFormTitle}</CardTitle>
+          <CardDescription>{t.requestFormHint}</CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="grid gap-5"
+            noValidate
+          >
           <input
             type="text"
             tabIndex={-1}
@@ -229,6 +247,16 @@ export function RepairRequestForm() {
             aria-hidden
             className="hidden"
             {...form.register("website")}
+          />
+          <input
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden
+            className="hidden"
+            value={String(startedAtRef.current)}
+            {...form.register("startedAt")}
+            readOnly
           />
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -250,7 +278,7 @@ export function RepairRequestForm() {
               <Label htmlFor="rr-phone">{t.reqPhone} *</Label>
               <IMaskInput
                 id="rr-phone"
-                mask="+000 000 000 000 000"
+                mask="+{47} 00 00 00 00"
                 lazy={false}
                 overwrite
                 inputMode="tel"
@@ -260,7 +288,9 @@ export function RepairRequestForm() {
                 )}
                 placeholder="+47 000 00 000"
                 value={form.watch("phone")}
-                onAccept={(v) => form.setValue("phone", String(v), { shouldDirty: true })}
+                onAccept={(v) =>
+                  form.setValue("phone", String(v), { shouldDirty: true })
+                }
               />
               {form.formState.errors.phone?.message && (
                 <p className="mt-1 text-xs text-amber-300">
@@ -456,8 +486,9 @@ export function RepairRequestForm() {
           )}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-zinc-500">
-              * {t.reqValidationRequired}
+            <p className="flex items-center gap-2 text-xs text-zinc-500">
+              <ShieldCheck className="h-4 w-4 text-cyan-200/80" />
+              <span>* {t.reqValidationRequired}</span>
             </p>
             <Button type="submit" disabled={!canSubmit}>
               {submitState === "sending" ? (
@@ -470,9 +501,10 @@ export function RepairRequestForm() {
               )}
             </Button>
           </div>
-        </form>
-      </CardContent>
-    </Card>
+          </form>
+        </CardContent>
+      </Card>
+    </>
   );
 }
 

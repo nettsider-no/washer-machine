@@ -4,6 +4,27 @@ import { isLocale } from "@/lib/i18n";
 
 const MAX_FILES = 3;
 const MAX_FILE_BYTES = 25 * 1024 * 1024; // keep within typical Telegram limits
+const MIN_HUMAN_MS = 2500;
+const MIN_GAP_MS = 20_000;
+const WINDOW_MS = 10 * 60_000;
+const MAX_PER_WINDOW = 3;
+
+type RateState = { ts: number[]; last: number };
+
+function getIp(request: Request): string {
+  const xff = request.headers.get("x-forwarded-for");
+  if (xff) return xff.split(",")[0]?.trim() || "unknown";
+  const realIp = request.headers.get("x-real-ip");
+  return realIp?.trim() || "unknown";
+}
+
+function getRateMap(): Map<string, RateState> {
+  const g = globalThis as unknown as {
+    __repairRateLimit?: Map<string, RateState>;
+  };
+  if (!g.__repairRateLimit) g.__repairRateLimit = new Map();
+  return g.__repairRateLimit;
+}
 
 function asString(v: FormDataEntryValue | null): string {
   if (!v) return "";
@@ -23,6 +44,28 @@ function timeLabel(v: string) {
 }
 
 export async function POST(request: Request) {
+  // Basic origin check (helps against cross-site form spam).
+  const origin = request.headers.get("origin");
+  const host = request.headers.get("host");
+  if (origin && host && !origin.includes(host)) {
+    return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+  }
+
+  // Simple in-memory rate limit (best-effort; works well on a single instance).
+  const ip = getIp(request);
+  const now = Date.now();
+  const rm = getRateMap();
+  const st = rm.get(ip) ?? { ts: [], last: 0 };
+  if (st.last && now - st.last < MIN_GAP_MS) {
+    rm.set(ip, st);
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+  const fresh = st.ts.filter((t) => now - t < WINDOW_MS);
+  if (fresh.length >= MAX_PER_WINDOW) {
+    rm.set(ip, { ts: fresh, last: st.last });
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   let fd: FormData;
   try {
     fd = await request.formData();
@@ -32,6 +75,12 @@ export async function POST(request: Request) {
 
   const website = asString(fd.get("website")).trim();
   if (website) return NextResponse.json({ ok: true });
+
+  const startedAtRaw = asString(fd.get("startedAt")).trim();
+  const startedAt = startedAtRaw ? Number(startedAtRaw) : NaN;
+  if (!Number.isFinite(startedAt) || now - startedAt < MIN_HUMAN_MS) {
+    return NextResponse.json({ error: "Too fast" }, { status: 429 });
+  }
 
   const localeRaw = asString(fd.get("locale")).trim();
   const locale = isLocale(localeRaw) ? localeRaw : "no";
@@ -51,8 +100,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
   const digits = digitsOnly(phone);
-  if (digits.length < 8 || digits.length > 15) {
+  if (digits.length !== 10 || !digits.startsWith("47")) {
     return NextResponse.json({ error: "Invalid phone" }, { status: 400 });
+  }
+  if (name.length < 2 || issue.length < 5) {
+    return NextResponse.json({ error: "Invalid fields" }, { status: 400 });
   }
 
   const mediaEntries = fd.getAll("media");
@@ -115,6 +167,9 @@ export async function POST(request: Request) {
     }
     return NextResponse.json({ error: "Failed to notify" }, { status: 502 });
   }
+
+  // Update rate limit only after successful message delivery.
+  rm.set(ip, { ts: [...fresh, now], last: now });
 
   if (files.length) {
     const media = files.map((f) => ({
