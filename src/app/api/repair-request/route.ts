@@ -5,7 +5,11 @@ import {
   sendTelegramMessage,
 } from "@/lib/telegram";
 import { isLocale } from "@/lib/i18n";
-import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
+import { getDatabaseUrl } from "@/lib/db";
+import {
+  insertOrder,
+  updateOrderTelegramMeta,
+} from "@/lib/orderRepo";
 import { formatOrderHtml, orderKeyboard, type OrderStatus } from "@/lib/orders";
 
 export const runtime = "nodejs";
@@ -45,14 +49,12 @@ function digitsOnly(s: string) {
 }
 
 export async function POST(request: Request) {
-  // Basic origin check (helps against cross-site form spam).
   const origin = request.headers.get("origin");
   const host = request.headers.get("host");
   if (origin && host && !origin.includes(host)) {
     return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
   }
 
-  // Simple in-memory rate limit (best-effort; works well on a single instance).
   const ip = getIp(request);
   const now = Date.now();
   const rm = getRateMap();
@@ -125,24 +127,12 @@ export async function POST(request: Request) {
     }
   }
 
-  // Create order in Supabase (mini-CRM storage)
-  let supabaseAdmin: ReturnType<typeof getSupabaseAdmin>;
+  let inserted;
   try {
-    supabaseAdmin = getSupabaseAdmin();
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    console.error("[api/repair-request] supabase env error:", msg);
-    return NextResponse.json(
-      { error: "Supabase is not configured (missing env on server)." },
-      { status: 503 }
-    );
-  }
-  const preferredWindow =
-    time === "today" || time === "tomorrow" || time === "soon" ? time : null;
-
-  const { data: inserted, error: insErr } = await supabaseAdmin
-    .from("orders")
-    .insert({
+    getDatabaseUrl();
+    const preferredWindow =
+      time === "today" || time === "tomorrow" || time === "soon" ? time : null;
+    inserted = await insertOrder({
       status: "new" as OrderStatus,
       locale,
       name,
@@ -159,28 +149,22 @@ export async function POST(request: Request) {
       error_code: errorCode || null,
       preferred_window: preferredWindow,
       preferred_comment: timeComment || null,
-    })
-    .select("*")
-    .single();
-
-  if (insErr || !inserted) {
-    console.error("[api/repair-request] supabase insert error", insErr);
-    const detail =
-      insErr?.message ??
-      (typeof insErr === "object" && insErr && "hint" in insErr
-        ? String((insErr as { hint?: string }).hint)
-        : undefined);
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[api/repair-request] db error", e);
+    if (msg.includes("Missing DATABASE_URL")) {
+      return NextResponse.json(
+        { error: "Database is not configured (missing DATABASE_URL)." },
+        { status: 503 }
+      );
+    }
     return NextResponse.json(
-      {
-        error: "Storage error",
-        detail,
-        code: (insErr as { code?: string })?.code,
-      },
+      { error: "Storage error", detail: msg },
       { status: 502 }
     );
   }
 
-  // Send Telegram "card" with inline buttons
   const { chatId } = getTelegramEnv();
   if (!chatId) {
     if (process.env.NODE_ENV === "development") {
@@ -190,7 +174,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Server is not configured for Telegram." }, { status: 503 });
   }
 
-  const cardText = formatOrderHtml(inserted as any);
+  const cardText = formatOrderHtml(inserted);
   const msg = await sendTelegramMessage({
     chat_id: chatId,
     text: cardText,
@@ -201,18 +185,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Failed to notify" }, { status: 502 });
   }
 
-  // Persist message linkage so we can edit it later from webhook
   const messageId = msg.json?.result?.message_id as number | undefined;
-  await supabaseAdmin
-    .from("orders")
-    .update({
-      tg_chat_id: String(chatId),
-      tg_message_id: messageId ?? null,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", inserted.id);
+  try {
+    await updateOrderTelegramMeta(inserted.id, String(chatId), messageId ?? null);
+  } catch (e) {
+    console.error("[api/repair-request] failed to save tg meta", e);
+  }
 
-  // Update rate limit only after successful message delivery.
   rm.set(ip, { ts: [...fresh, now], last: now });
 
   if (files.length) {
@@ -224,10 +203,8 @@ export async function POST(request: Request) {
     const mediaRes = await sendTelegramMediaGroup({ media });
     if (!mediaRes.ok) {
       console.error("Telegram media error:", mediaRes.json);
-      // Don't fail the request: the text is already delivered.
     }
   }
 
   return NextResponse.json({ ok: true });
 }
-

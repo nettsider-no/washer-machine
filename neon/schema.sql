@@ -1,6 +1,7 @@
--- Minimal schema for Telegram mini-CRM on Vercel (Supabase Postgres)
+-- Neon Postgres (create via Vercel → Storage → Neon, then run this in Neon SQL Editor)
 
--- Orders table
+create extension if not exists "pgcrypto";
+
 create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -31,7 +32,6 @@ create table if not exists public.orders (
 create index if not exists orders_status_idx on public.orders(status);
 create index if not exists orders_visit_idx on public.orders(visit_date, visit_time);
 
--- Simple per-user session storage for edit dialogs
 create table if not exists public.tg_sessions (
   user_id bigint primary key,
   session jsonb not null,
@@ -40,11 +40,3 @@ create table if not exists public.tg_sessions (
 );
 
 create index if not exists tg_sessions_expires_idx on public.tg_sessions(expires_at);
-
--- Vercel / PostgREST notes:
--- - In Vercel set SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (the "service_role" secret from Supabase → Project Settings → API).
--- - Do NOT use the anon key in SUPABASE_SERVICE_ROLE_KEY (inserts will fail if RLS blocks anon).
--- - If you enabled RLS on these tables without policies, either add policies or run:
---   alter table public.orders disable row level security;
---   alter table public.tg_sessions disable row level security;
-
