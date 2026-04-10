@@ -8,6 +8,8 @@ import { isLocale } from "@/lib/i18n";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { formatOrderHtml, orderKeyboard, type OrderStatus } from "@/lib/orders";
 
+export const runtime = "nodejs";
+
 const MAX_FILES = 3;
 const MAX_FILE_BYTES = 25 * 1024 * 1024; // keep within typical Telegram limits
 const MIN_HUMAN_MS = 2500;
@@ -124,7 +126,17 @@ export async function POST(request: Request) {
   }
 
   // Create order in Supabase (mini-CRM storage)
-  const supabaseAdmin = getSupabaseAdmin();
+  let supabaseAdmin: ReturnType<typeof getSupabaseAdmin>;
+  try {
+    supabaseAdmin = getSupabaseAdmin();
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[api/repair-request] supabase env error:", msg);
+    return NextResponse.json(
+      { error: "Supabase is not configured (missing env on server)." },
+      { status: 503 }
+    );
+  }
   const { data: inserted, error: insErr } = await supabaseAdmin
     .from("orders")
     .insert({
