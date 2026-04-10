@@ -29,20 +29,79 @@ export type OrderRow = {
   tg_message_id: number | null;
 };
 
-export function cbData(data: { v: 1; a: string; id: string; f?: string }) {
-  // Must stay <= 64 bytes. UUID makes it tight but still ok.
-  return JSON.stringify(data);
+/**
+ * Telegram callback_data max 64 bytes. JSON + full UUID overflows — use compact form:
+ * `1|t|<uuid>` (~42 bytes). Delimiter | is not in UUIDs.
+ */
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export function cbCompact(action: string, orderId: string): string {
+  return `1|${action}|${orderId}`;
+}
+
+export type ParsedCallback =
+  | { v: 1; a: "take" | "edit" | "done" | "cancel" | "edit_back"; id: string }
+  | { v: 1; a: "edit_field"; id: string; f: "date" | "time" | "comment" };
+
+export function parseCallbackData(raw: string): ParsedCallback | null {
+  const t = raw.trim();
+  if (!t) return null;
+
+  // Legacy JSON (often truncated by Telegram — prefer compact on new cards)
+  if (t.startsWith("{")) {
+    try {
+      const j = JSON.parse(t) as { v?: number; a?: string; id?: string; f?: string };
+      if (j?.v !== 1 || typeof j.a !== "string" || typeof j.id !== "string") return null;
+      if (j.a === "edit_field") {
+        if (j.f !== "date" && j.f !== "time" && j.f !== "comment") return null;
+        return { v: 1, a: "edit_field", id: j.id, f: j.f };
+      }
+      if (j.a === "take" || j.a === "edit" || j.a === "done" || j.a === "cancel" || j.a === "edit_back") {
+        return { v: 1, a: j.a, id: j.id };
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  const parts = t.split("|");
+  if (parts.length !== 3 || parts[0] !== "1") return null;
+  const [, code, id] = parts;
+  if (!UUID_RE.test(id)) return null;
+
+  switch (code) {
+    case "t":
+      return { v: 1, a: "take", id };
+    case "e":
+      return { v: 1, a: "edit", id };
+    case "d":
+      return { v: 1, a: "done", id };
+    case "c":
+      return { v: 1, a: "cancel", id };
+    case "b":
+      return { v: 1, a: "edit_back", id };
+    case "fd":
+      return { v: 1, a: "edit_field", id, f: "date" };
+    case "ft":
+      return { v: 1, a: "edit_field", id, f: "time" };
+    case "fc":
+      return { v: 1, a: "edit_field", id, f: "comment" };
+    default:
+      return null;
+  }
 }
 
 export function orderKeyboard(orderId: string, status: OrderStatus) {
   const rows: { text: string; callback_data: string }[][] = [
     [
-      { text: "🧰 Взять в работу", callback_data: cbData({ v: 1, a: "take", id: orderId }) },
-      { text: "✏️ Редактировать", callback_data: cbData({ v: 1, a: "edit", id: orderId }) },
+      { text: "🧰 Взять в работу", callback_data: cbCompact("t", orderId) },
+      { text: "✏️ Редактировать", callback_data: cbCompact("e", orderId) },
     ],
     [
-      { text: "✅ Выполнено", callback_data: cbData({ v: 1, a: "done", id: orderId }) },
-      { text: "🚫 Отменить", callback_data: cbData({ v: 1, a: "cancel", id: orderId }) },
+      { text: "✅ Выполнено", callback_data: cbCompact("d", orderId) },
+      { text: "🚫 Отменить", callback_data: cbCompact("c", orderId) },
     ],
   ];
 
@@ -58,12 +117,12 @@ export function editMenuKeyboard(orderId: string) {
   return {
     inline_keyboard: [
       [
-        { text: "📅 Дата", callback_data: cbData({ v: 1, a: "edit_field", id: orderId, f: "date" }) },
-        { text: "⏰ Время", callback_data: cbData({ v: 1, a: "edit_field", id: orderId, f: "time" }) },
+        { text: "📅 Дата", callback_data: cbCompact("fd", orderId) },
+        { text: "⏰ Время", callback_data: cbCompact("ft", orderId) },
       ],
       [
-        { text: "📝 Комментарий", callback_data: cbData({ v: 1, a: "edit_field", id: orderId, f: "comment" }) },
-        { text: "⬅️ Назад", callback_data: cbData({ v: 1, a: "edit_back", id: orderId }) },
+        { text: "📝 Комментарий", callback_data: cbCompact("fc", orderId) },
+        { text: "⬅️ Назад", callback_data: cbCompact("b", orderId) },
       ],
     ],
   };

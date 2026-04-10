@@ -11,12 +11,17 @@ import {
   editMenuKeyboard,
   formatOrderHtml,
   orderKeyboard,
+  parseCallbackData,
   parseHm,
   parseYmd,
   type OrderRow,
   type OrderStatus,
 } from "@/lib/orders";
-import { editTelegramMessageText, sendTelegramMessage } from "@/lib/telegram";
+import {
+  answerCallbackQuery,
+  editTelegramMessageText,
+  sendTelegramMessage,
+} from "@/lib/telegram";
 
 export const runtime = "nodejs";
 
@@ -36,33 +41,21 @@ type TgUpdate = {
   };
 };
 
-type Cb =
-  | { v: 1; a: "take" | "edit" | "done" | "cancel" | "edit_back"; id: string }
-  | { v: 1; a: "edit_field"; id: string; f: "date" | "time" | "comment" };
-
-function decodeCb(raw: string): Cb | null {
-  try {
-    const j = JSON.parse(raw) as any;
-    if (!j || j.v !== 1 || typeof j.a !== "string" || typeof j.id !== "string")
-      return null;
-    if (j.a === "edit_field") {
-      if (j.f !== "date" && j.f !== "time" && j.f !== "comment") return null;
-    }
-    return j as Cb;
-  } catch {
-    return null;
-  }
-}
-
 async function refreshCard(o: OrderRow) {
   if (!o.tg_chat_id || !o.tg_message_id) return;
   const chatId = /^-?\d+$/.test(o.tg_chat_id) ? Number(o.tg_chat_id) : o.tg_chat_id;
-  await editTelegramMessageText({
+  const res = await editTelegramMessageText({
     chat_id: chatId,
     message_id: o.tg_message_id,
     text: formatOrderHtml(o),
     reply_markup: orderKeyboard(o.id, o.status),
   });
+  if (!res.ok) {
+    const desc = String(res.json?.description ?? "");
+    if (!desc.toLowerCase().includes("message is not modified")) {
+      console.error("[api/telegram] editMessageText failed", res.json);
+    }
+  }
 }
 
 export async function POST(request: Request) {
@@ -78,15 +71,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  try {
-    if (update.callback_query) {
-      const cq = update.callback_query;
+  if (update.callback_query) {
+    const cq = update.callback_query;
+    let callbackAcked = false;
+    try {
       const raw = cq.data ?? "";
-      const cb = decodeCb(raw);
-      if (!cb) return NextResponse.json({ ok: true });
+      const cb = parseCallbackData(raw);
+      if (!cb) {
+        return NextResponse.json({ ok: true });
+      }
 
       const order = await loadOrderById(cb.id);
-      if (!order) return NextResponse.json({ ok: true });
+      if (!order) {
+        return NextResponse.json({ ok: true });
+      }
 
       if (cb.a === "edit") {
         const chatId = cq.message?.chat.id;
@@ -136,8 +134,23 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json({ ok: true });
+    } catch (e) {
+      console.error("[api/telegram] callback error", e);
+      await answerCallbackQuery({
+        callback_query_id: cq.id,
+        text: "Ошибка сервера. Попробуй ещё раз.",
+        show_alert: true,
+      });
+      callbackAcked = true;
+      return NextResponse.json({ ok: true });
+    } finally {
+      if (!callbackAcked) {
+        await answerCallbackQuery({ callback_query_id: cq.id });
+      }
     }
+  }
 
+  try {
     if (update.message?.text && update.message.from && update.message.chat?.id) {
       const text = update.message.text.trim();
       const chatId = update.message.chat.id;

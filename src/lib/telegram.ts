@@ -116,6 +116,19 @@ export async function editTelegramMessageText(params: {
   });
 }
 
+/** Required for inline buttons — stops the client "loading" spinner. */
+export async function answerCallbackQuery(params: {
+  callback_query_id: string;
+  text?: string;
+  show_alert?: boolean;
+}): Promise<void> {
+  await telegramCall("answerCallbackQuery", {
+    callback_query_id: params.callback_query_id,
+    ...(params.text ? { text: params.text.slice(0, 200) } : {}),
+    show_alert: params.show_alert ?? false,
+  });
+}
+
 export type TelegramMediaKind = "photo" | "video";
 
 export async function sendTelegramMediaGroup(params: {
