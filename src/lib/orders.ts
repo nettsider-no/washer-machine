@@ -80,11 +80,39 @@ export function parseCallbackData(raw: string): ParsedCallback | null {
   }
 }
 
+/**
+ * Старые карточки имели кнопки «Редактировать» и др. — Telegram не меняет клавиатуру сам.
+ * Если пришёл callback вида 1|<любой код кроме t/d/c>|<uuid>, возвращаем id заявки,
+ * чтобы вебхук мог вызвать editMessageText и обновить кнопки.
+ */
+export function parseStaleCardOrderId(raw: string): string | null {
+  const t = raw.trim();
+  if (t.startsWith("{")) {
+    try {
+      const j = JSON.parse(t) as { v?: number; a?: string; id?: string };
+      if (j?.v !== 1 || typeof j.id !== "string" || !UUID_RE.test(j.id)) return null;
+      if (j.a === "take" || j.a === "done" || j.a === "cancel") return null;
+      if (typeof j.a === "string" && j.a.length) return j.id;
+    } catch {
+      return null;
+    }
+    return null;
+  }
+  const parts = t.split("|");
+  if (parts.length !== 3 || parts[0] !== "1") return null;
+  const id = parts[2] ?? "";
+  if (!UUID_RE.test(id)) return null;
+  const code = parts[1] ?? "";
+  if (code === "t" || code === "d" || code === "c") return null;
+  if (!/^[a-z]{1,2}$/.test(code)) return null;
+  return id;
+}
+
 export function orderKeyboard(orderId: string, _status: OrderStatus) {
   return {
     inline_keyboard: [
+      [{ text: "🧰 Взять в работу", callback_data: cbCompact("t", orderId) }],
       [
-        { text: "🧰 Взять в работу", callback_data: cbCompact("t", orderId) },
         { text: "✅ Выполнено", callback_data: cbCompact("d", orderId) },
         { text: "🚫 Отменить", callback_data: cbCompact("c", orderId) },
       ],

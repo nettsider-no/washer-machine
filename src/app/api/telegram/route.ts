@@ -8,6 +8,7 @@ import {
   formatOrderHtml,
   orderKeyboard,
   parseCallbackData,
+  parseStaleCardOrderId,
   type OrderRow,
   type OrderStatus,
 } from "@/lib/orders";
@@ -111,6 +112,25 @@ export async function POST(request: Request) {
       const raw = cq.data ?? "";
       const cb = parseCallbackData(raw);
       if (!cb) {
+        const staleOrderId = parseStaleCardOrderId(raw);
+        const msg = cq.message;
+        if (staleOrderId && msg) {
+          let stale = await loadOrderById(staleOrderId);
+          if (stale) {
+            const cid = String(msg.chat.id);
+            const mid = msg.message_id;
+            if (stale.tg_chat_id !== cid || stale.tg_message_id !== mid) {
+              stale = await patchOrder(stale.id, { tg_chat_id: cid, tg_message_id: mid });
+            }
+            await editTelegramMessageText({
+              chat_id: msg.chat.id,
+              message_id: mid,
+              text: formatOrderHtml(stale),
+              reply_markup: orderKeyboard(stale.id, stale.status),
+            });
+            return NextResponse.json({ ok: true });
+          }
+        }
         if (replyChat) {
           await sendTelegramMessage({
             chat_id: replyChat,
