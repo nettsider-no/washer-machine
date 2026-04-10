@@ -2,7 +2,6 @@
 
 import { Header } from "./Header";
 import { HeroVisual } from "./HeroVisual";
-import { CalBooking } from "./CalBooking";
 import { ContactForm } from "./ContactForm";
 import { ServiceIcon, serviceIconAccent } from "./ServiceIcon";
 import { useLocale } from "./LocaleProvider";
@@ -73,21 +72,6 @@ export function HomePage() {
                 </li>
               ))}
             </ul>
-          </div>
-        </section>
-
-        <section
-          id="booking"
-          className="border-t border-white/10 bg-black/10 px-4 py-20 sm:px-6"
-        >
-          <div className="mx-auto max-w-6xl text-center">
-            <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-wide text-white sm:text-3xl">
-              {t.bookingTitle}
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-zinc-400">{t.bookingLead}</p>
-            <div className="mt-10">
-              <CalBooking missingMessage={t.bookingCalMissing} />
-            </div>
           </div>
         </section>
 

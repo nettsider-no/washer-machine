@@ -56,10 +56,6 @@ export type Messages = {
   formError: string;
   formRequired: string;
   footerArea: string;
-  navBooking: string;
-  bookingTitle: string;
-  bookingLead: string;
-  bookingCalMissing: string;
 };
 
 export const messages: Record<Locale, Messages> = {
@@ -109,12 +105,6 @@ export const messages: Record<Locale, Messages> = {
     formError: "Noe gikk galt. Prøv igjen senere eller ring oss.",
     formRequired: "Fyll inn obligatoriske felt.",
     footerArea: "Norge",
-    navBooking: "Bestill tid",
-    bookingTitle: "Bestill hjemmebesøk",
-    bookingLead:
-      "Velg ledig tid i kalenderen under (Cal.com). Du får bekreftelse på e-post — og kan endre/avlyse derfra.",
-    bookingCalMissing:
-      "Kalenderen er ikke koblet til ennå. Legg til NEXT_PUBLIC_CALCOM_LINK i miljøvariabler (f.eks. ditt-brukernavn/besok) i Vercel og bygg på nytt. Opprett en hendelse på cal.com først.",
   },
   ru: {
     metaTitle: "Ремонт стиральных машин в Норвегии",
@@ -162,12 +152,6 @@ export const messages: Record<Locale, Messages> = {
     formError: "Ошибка отправки. Попробуйте позже или позвоните.",
     formRequired: "Заполните обязательные поля.",
     footerArea: "Норвегия",
-    navBooking: "Выезд",
-    bookingTitle: "Запись на выезд мастера",
-    bookingLead:
-      "Выберите свободное время в календаре ниже (Cal.com). Подтверждение придёт на почту; перенос и отмена — там же.",
-    bookingCalMissing:
-      "Календарь не подключён. Добавьте NEXT_PUBLIC_CALCOM_LINK в переменные окружения (например username/visit) в Vercel и пересоберите проект. Сначала создайте тип встречи на cal.com.",
   },
   en: {
     metaTitle: "Washing machine repair in Norway",
@@ -215,11 +199,5 @@ export const messages: Record<Locale, Messages> = {
     formError: "Something went wrong. Please try again later or call us.",
     formRequired: "Please fill in the required fields.",
     footerArea: "Norway",
-    navBooking: "Book visit",
-    bookingTitle: "Book a home visit",
-    bookingLead:
-      "Choose an available time in the calendar below (Cal.com). You’ll get email confirmation and can reschedule or cancel from there.",
-    bookingCalMissing:
-      "Calendar is not connected yet. Add NEXT_PUBLIC_CALCOM_LINK to your environment (e.g. your-username/visit) in Vercel and redeploy. Create an event type on cal.com first.",
   },
 };

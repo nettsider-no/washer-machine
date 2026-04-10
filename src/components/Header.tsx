@@ -20,9 +20,6 @@ export function Header() {
           <a href="#services" className="transition hover:text-cyan-300">
             {t.navServices}
           </a>
-          <a href="#booking" className="transition hover:text-cyan-300">
-            {t.navBooking}
-          </a>
           <a href="#contact" className="transition hover:text-cyan-300">
             {t.navContact}
           </a>
