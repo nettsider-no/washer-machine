@@ -40,24 +40,21 @@ export function cbCompact(action: string, orderId: string): string {
   return `1|${action}|${orderId}`;
 }
 
-export type ParsedCallback =
-  | { v: 1; a: "take" | "edit" | "done" | "cancel" | "edit_back"; id: string }
-  | { v: 1; a: "edit_field"; id: string; f: "date" | "time" | "comment" };
+export type ParsedCallback = {
+  v: 1;
+  a: "take" | "done" | "cancel";
+  id: string;
+};
 
 export function parseCallbackData(raw: string): ParsedCallback | null {
   const t = raw.trim();
   if (!t) return null;
 
-  // Legacy JSON (often truncated by Telegram — prefer compact on new cards)
   if (t.startsWith("{")) {
     try {
-      const j = JSON.parse(t) as { v?: number; a?: string; id?: string; f?: string };
-      if (j?.v !== 1 || typeof j.a !== "string" || typeof j.id !== "string") return null;
-      if (j.a === "edit_field") {
-        if (j.f !== "date" && j.f !== "time" && j.f !== "comment") return null;
-        return { v: 1, a: "edit_field", id: j.id, f: j.f };
-      }
-      if (j.a === "take" || j.a === "edit" || j.a === "done" || j.a === "cancel" || j.a === "edit_back") {
+      const j = JSON.parse(t) as { v?: number; a?: string; id?: string };
+      if (j?.v !== 1 || typeof j.id !== "string") return null;
+      if (j.a === "take" || j.a === "done" || j.a === "cancel") {
         return { v: 1, a: j.a, id: j.id };
       }
       return null;
@@ -74,55 +71,22 @@ export function parseCallbackData(raw: string): ParsedCallback | null {
   switch (code) {
     case "t":
       return { v: 1, a: "take", id };
-    case "e":
-      return { v: 1, a: "edit", id };
     case "d":
       return { v: 1, a: "done", id };
     case "c":
       return { v: 1, a: "cancel", id };
-    case "b":
-      return { v: 1, a: "edit_back", id };
-    case "fd":
-      return { v: 1, a: "edit_field", id, f: "date" };
-    case "ft":
-      return { v: 1, a: "edit_field", id, f: "time" };
-    case "fc":
-      return { v: 1, a: "edit_field", id, f: "comment" };
     default:
       return null;
   }
 }
 
-export function orderKeyboard(orderId: string, status: OrderStatus) {
-  const rows: { text: string; callback_data: string }[][] = [
-    [
-      { text: "🧰 Взять в работу", callback_data: cbCompact("t", orderId) },
-      { text: "✏️ Редактировать", callback_data: cbCompact("e", orderId) },
-    ],
-    [
-      { text: "✅ Выполнено", callback_data: cbCompact("d", orderId) },
-      { text: "🚫 Отменить", callback_data: cbCompact("c", orderId) },
-    ],
-  ];
-
-  // Optionally you could change buttons depending on status.
-  if (status !== "new") {
-    // keep same for now (simple + predictable)
-  }
-
-  return { inline_keyboard: rows };
-}
-
-export function editMenuKeyboard(orderId: string) {
+export function orderKeyboard(orderId: string, _status: OrderStatus) {
   return {
     inline_keyboard: [
       [
-        { text: "📅 Дата", callback_data: cbCompact("fd", orderId) },
-        { text: "⏰ Время", callback_data: cbCompact("ft", orderId) },
-      ],
-      [
-        { text: "📝 Комментарий", callback_data: cbCompact("fc", orderId) },
-        { text: "⬅️ Назад", callback_data: cbCompact("b", orderId) },
+        { text: "🧰 Взять в работу", callback_data: cbCompact("t", orderId) },
+        { text: "✅ Выполнено", callback_data: cbCompact("d", orderId) },
+        { text: "🚫 Отменить", callback_data: cbCompact("c", orderId) },
       ],
     ],
   };
@@ -173,19 +137,3 @@ export function formatOrderHtml(o: OrderRow): string {
 
   return parts.join("\n");
 }
-
-export function parseYmd(s: string): string | null {
-  const t = s.trim();
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(t)) return null;
-  return t;
-}
-
-export function parseHm(s: string): string | null {
-  const t = s.trim();
-  if (!/^\d{2}:\d{2}$/.test(t)) return null;
-  const [hh, mm] = t.split(":").map(Number);
-  if (hh < 0 || hh > 23) return null;
-  if (mm < 0 || mm > 59) return null;
-  return t;
-}
-

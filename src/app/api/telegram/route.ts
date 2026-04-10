@@ -1,25 +1,20 @@
 import { NextResponse } from "next/server";
 import {
-  deleteTgSession,
-  getTgSession,
   listActiveOrders,
   loadOrderById,
   patchOrder,
-  upsertTgSession,
 } from "@/lib/orderRepo";
 import {
-  editMenuKeyboard,
   formatOrderHtml,
   orderKeyboard,
   parseCallbackData,
-  parseHm,
-  parseYmd,
   type OrderRow,
   type OrderStatus,
 } from "@/lib/orders";
 import {
   answerCallbackQuery,
   editTelegramMessageText,
+  normalizeSecret,
   sendTelegramMessage,
 } from "@/lib/telegram";
 
@@ -42,12 +37,37 @@ type TgUpdate = {
   };
 };
 
-async function refreshCard(o: OrderRow) {
-  if (!o.tg_chat_id || !o.tg_message_id) return;
+type CardMessageRef = { chat: { id: number }; message_id: number };
+
+function isBotCommand(text: string, command: string): boolean {
+  const first = text.trim().split(/\s+/)[0] ?? "";
+  if (first === command) return true;
+  return first.startsWith(`${command}@`);
+}
+
+function resolveCardTarget(
+  o: OrderRow,
+  ref?: CardMessageRef
+): { chat_id: string | number; message_id: number } | null {
+  if (ref) {
+    return { chat_id: ref.chat.id, message_id: ref.message_id };
+  }
+  if (!o.tg_chat_id || o.tg_message_id == null) {
+    console.warn("[api/telegram] refreshCard: no tg_chat_id/tg_message_id in DB and no callback message", {
+      orderId: o.id,
+    });
+    return null;
+  }
   const chatId = /^-?\d+$/.test(o.tg_chat_id) ? Number(o.tg_chat_id) : o.tg_chat_id;
+  return { chat_id: chatId, message_id: o.tg_message_id };
+}
+
+async function refreshCard(o: OrderRow, messageRef?: CardMessageRef) {
+  const target = resolveCardTarget(o, messageRef);
+  if (!target) return;
   const res = await editTelegramMessageText({
-    chat_id: chatId,
-    message_id: o.tg_message_id,
+    chat_id: target.chat_id,
+    message_id: target.message_id,
     text: formatOrderHtml(o),
     reply_markup: orderKeyboard(o.id, o.status),
   });
@@ -67,8 +87,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const expected = process.env.TELEGRAM_WEBHOOK_SECRET?.trim();
-  const got = request.headers.get("x-telegram-bot-api-secret-token")?.trim();
+  const expected = normalizeSecret(process.env.TELEGRAM_WEBHOOK_SECRET);
+  const got = normalizeSecret(request.headers.get("x-telegram-bot-api-secret-token") ?? undefined);
   if (expected && got !== expected) {
     console.error("[api/telegram] webhook secret mismatch (check setWebhook secret_token vs Vercel TELEGRAM_WEBHOOK_SECRET)");
     if (update.callback_query?.id) {
@@ -85,7 +105,6 @@ export async function POST(request: Request) {
     const cq = update.callback_query;
     const replyChat = cq.message?.chat.id;
 
-    // Снимаем «загрузку» сразу — до БД и остальных запросов к Telegram.
     await answerCallbackQuery({ callback_query_id: cq.id });
 
     try {
@@ -95,13 +114,13 @@ export async function POST(request: Request) {
         if (replyChat) {
           await sendTelegramMessage({
             chat_id: replyChat,
-            text: "Кнопка устарела или битая. Нужна <b>новая заявка</b> с сайта (старые карточки до обновления могут не работать).",
+            text: "Кнопка устарела. Отправьте новую заявку с сайта — под этим сообщением будет актуальная карточка.",
           });
         }
         return NextResponse.json({ ok: true });
       }
 
-      const order = await loadOrderById(cb.id);
+      let order = await loadOrderById(cb.id);
       if (!order) {
         if (replyChat) {
           await sendTelegramMessage({
@@ -112,38 +131,15 @@ export async function POST(request: Request) {
         return NextResponse.json({ ok: true });
       }
 
-      if (cb.a === "edit") {
-        if (replyChat) {
-          await sendTelegramMessage({
-            chat_id: replyChat,
-            text: "✏️ <b>Редактирование</b>\nВыбери поле:",
-            reply_markup: editMenuKeyboard(order.id),
-          });
+      const cardRef: CardMessageRef | undefined = cq.message
+        ? { chat: cq.message.chat, message_id: cq.message.message_id }
+        : undefined;
+      if (cardRef) {
+        const cid = String(cardRef.chat.id);
+        const mid = cardRef.message_id;
+        if (order.tg_chat_id !== cid || order.tg_message_id !== mid) {
+          order = await patchOrder(order.id, { tg_chat_id: cid, tg_message_id: mid });
         }
-        return NextResponse.json({ ok: true });
-      }
-
-      if (cb.a === "edit_back") {
-        await deleteTgSession(cq.from.id);
-        return NextResponse.json({ ok: true });
-      }
-
-      if (cb.a === "edit_field") {
-        await upsertTgSession(
-          cq.from.id,
-          { mode: "edit", orderId: order.id, field: cb.f },
-          new Date(Date.now() + 10 * 60_000)
-        );
-        if (replyChat) {
-          const prompt =
-            cb.f === "date"
-              ? "Введите дату выезда в формате <code>YYYY-MM-DD</code> (пример: <code>2026-04-10</code>)."
-              : cb.f === "time"
-                ? "Введите время выезда в формате <code>HH:MM</code> (пример: <code>18:30</code>)."
-                : "Введите комментарий / дополнительные детали (одно сообщение).";
-          await sendTelegramMessage({ chat_id: replyChat, text: prompt });
-        }
-        return NextResponse.json({ ok: true });
       }
 
       let nextStatus: OrderStatus | null = null;
@@ -153,7 +149,7 @@ export async function POST(request: Request) {
 
       if (nextStatus) {
         const updated = await patchOrder(order.id, { status: nextStatus });
-        await refreshCard(updated);
+        await refreshCard(updated, cardRef);
         return NextResponse.json({ ok: true });
       }
 
@@ -174,9 +170,8 @@ export async function POST(request: Request) {
     if (update.message?.text && update.message.from && update.message.chat?.id) {
       const text = update.message.text.trim();
       const chatId = update.message.chat.id;
-      const userId = update.message.from.id;
 
-      if (text === "/orders" || text.startsWith("/orders@")) {
+      if (isBotCommand(text, "/orders")) {
         const orders = await listActiveOrders();
         const lines = orders.map((o, i) => {
           const when = `${o.visit_date ?? "—"} ${o.visit_time ?? "—"}`.trim();
@@ -190,56 +185,6 @@ export async function POST(request: Request) {
             "━━━━━━━━━━━━━━━━━━━━\n" +
             (lines.length ? lines.join("\n") : "— пусто —"),
         });
-        return NextResponse.json({ ok: true });
-      }
-
-      const row = await getTgSession(userId);
-      const session = row?.session as
-        | { mode?: string; orderId?: string; field?: string }
-        | undefined;
-      if (session?.mode === "edit" && session.orderId && session.field) {
-        const ord = await loadOrderById(session.orderId);
-        if (!ord) {
-          await deleteTgSession(userId);
-          return NextResponse.json({ ok: true });
-        }
-
-        if (session.field === "date") {
-          const ymd = parseYmd(text);
-          if (!ymd) {
-            await sendTelegramMessage({
-              chat_id: chatId,
-              text: "Неверный формат. Нужно <code>YYYY-MM-DD</code>.",
-            });
-            return NextResponse.json({ ok: true });
-          }
-          const updated = await patchOrder(ord.id, { visit_date: ymd });
-          await refreshCard(updated);
-          await deleteTgSession(userId);
-          await sendTelegramMessage({ chat_id: chatId, text: "✅ Дата обновлена." });
-          return NextResponse.json({ ok: true });
-        }
-
-        if (session.field === "time") {
-          const hm = parseHm(text);
-          if (!hm) {
-            await sendTelegramMessage({
-              chat_id: chatId,
-              text: "Неверный формат. Нужно <code>HH:MM</code>.",
-            });
-            return NextResponse.json({ ok: true });
-          }
-          const updated = await patchOrder(ord.id, { visit_time: hm });
-          await refreshCard(updated);
-          await deleteTgSession(userId);
-          await sendTelegramMessage({ chat_id: chatId, text: "✅ Время обновлено." });
-          return NextResponse.json({ ok: true });
-        }
-
-        const updated = await patchOrder(ord.id, { visit_comment: text.slice(0, 1000) });
-        await refreshCard(updated);
-        await deleteTgSession(userId);
-        await sendTelegramMessage({ chat_id: chatId, text: "✅ Комментарий обновлён." });
         return NextResponse.json({ ok: true });
       }
     }
