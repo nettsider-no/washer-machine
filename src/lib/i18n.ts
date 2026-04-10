@@ -43,6 +43,41 @@ export type Messages = {
   servicesTitle: string;
   servicesIntro: string;
   services: { title: string; text: string }[];
+  requestTitle: string;
+  requestLead: string;
+  requestFormTitle: string;
+  requestFormHint: string;
+  reqName: string;
+  reqPhone: string;
+  reqAddress: string;
+  reqBrand: string;
+  reqBrandOther: string;
+  reqBrandUnknown: string;
+  reqBrandPlaceholder: string;
+  reqModel: string;
+  reqIssue: string;
+  reqIssuePlaceholder: string;
+  reqIssueHintsLabel: string;
+  reqIssueHints: string[];
+  reqErrorCode: string;
+  reqMedia: string;
+  reqMediaHint: string;
+  reqTime: string;
+  reqTimePlaceholder: string;
+  reqTimeToday: string;
+  reqTimeTomorrow: string;
+  reqTimeSoon: string;
+  reqTimeComment: string;
+  reqTimeCommentPlaceholder: string;
+  reqSubmit: string;
+  reqSending: string;
+  reqSuccessTitle: string;
+  reqSuccessText: string;
+  reqSendAnother: string;
+  reqValidationRequired: string;
+  reqValidationPhone: string;
+  reqValidationMedia: string;
+  reqError: string;
   contactTitle: string;
   contactLead: string;
   formName: string;
@@ -91,6 +126,52 @@ export const messages: Record<Locale, Messages> = {
         text: "Korrekt tilkobling til vann og avløp, nivellering og testkjøring etter montering.",
       },
     ],
+    requestTitle: "Bestill reparasjon",
+    requestLead:
+      "Fyll ut skjemaet — vi sender detaljene direkte til mesteren. Jo mer presist, jo raskere og enklere blir det å hjelpe.",
+    requestFormTitle: "Book repair of your washing machine",
+    requestFormHint:
+      "Feltene med * er obligatoriske. Legg ved bilder/video hvis mulig — det hjelper med diagnose.",
+    reqName: "Navn",
+    reqPhone: "Telefon",
+    reqAddress: "Full adresse (valgfritt)",
+    reqBrand: "Merke",
+    reqBrandOther: "Annet",
+    reqBrandUnknown: "Jeg vet ikke",
+    reqBrandPlaceholder: "Velg merke",
+    reqModel: "Modell (valgfritt)",
+    reqIssue: "Hva er problemet?",
+    reqIssuePlaceholder: "Beskriv symptomer, når det startet, hva som ble prøvd…",
+    reqIssueHintsLabel: "Hurtigvalg",
+    reqIssueHints: [
+      "Tømmer ikke",
+      "Varmer ikke",
+      "Bråker mye",
+      "Starter ikke",
+      "Lekker",
+      "Feilkode",
+      "Vibrerer / hopper",
+      "Lukter brent",
+    ],
+    reqErrorCode: "Feilkode (valgfritt)",
+    reqMedia: "Foto / video (opptil 3)",
+    reqMediaHint: "JPG/PNG/WebP eller video. Maks 3 filer.",
+    reqTime: "Ønsket tidspunkt",
+    reqTimePlaceholder: "Velg",
+    reqTimeToday: "I dag",
+    reqTimeTomorrow: "I morgen",
+    reqTimeSoon: "I løpet av de nærmeste dagene",
+    reqTimeComment: "Kommentar til tidspunkt (valgfritt)",
+    reqTimeCommentPlaceholder: "F.eks. etter 18:00, før 12:00, helg…",
+    reqSubmit: "Send bestilling",
+    reqSending: "Sender…",
+    reqSuccessTitle: "Bestillingen er sendt!",
+    reqSuccessText: "Mesteren kontakter deg så snart som mulig.",
+    reqSendAnother: "Send en ny bestilling",
+    reqValidationRequired: "Vennligst fyll ut obligatoriske felt.",
+    reqValidationPhone: "Skriv inn et gyldig telefonnummer.",
+    reqValidationMedia: "Du kan laste opp maks 3 filer.",
+    reqError: "Kunne ikke sende. Prøv igjen senere eller ring oss.",
     contactTitle: "Kontakt",
     contactLead:
       "Fyll ut skjemaet — vi svarer så snart vi kan. Du kan også ringe eller skrive i messenger du finner i bunnteksten.",
@@ -138,6 +219,54 @@ export const messages: Record<Locale, Messages> = {
         text: "Правильное подключение к воде и канализации, выравнивание, пробный запуск.",
       },
     ],
+    requestTitle: "Запись на ремонт",
+    requestLead:
+      "Заполните форму — данные уйдут мастеру сразу в Telegram. Чем точнее описание, тем быстрее диагностика и выезд.",
+    requestFormTitle: "Записаться на ремонт стиральной машины",
+    requestFormHint:
+      "Поля со * обязательны. По возможности прикрепите фото/видео — это сильно помогает.",
+    reqName: "Имя",
+    reqPhone: "Телефон",
+    reqAddress: "Полный адрес (необязательно)",
+    reqBrand: "Марка стиралки",
+    reqBrandOther: "Другая",
+    reqBrandUnknown: "Не знаю",
+    reqBrandPlaceholder: "Выберите марку",
+    reqModel: "Модель (необязательно)",
+    reqIssue: "Что случилось с машиной?",
+    reqIssuePlaceholder:
+      "Опишите симптомы, когда началось, что уже пробовали сделать…",
+    reqIssueHintsLabel: "Подсказки",
+    reqIssueHints: [
+      "Не сливает",
+      "Не греет",
+      "Сильно гудит",
+      "Не включается",
+      "Течёт",
+      "Выдаёт ошибку",
+      "Сильно вибрирует",
+      "Пахнет гарью",
+    ],
+    reqErrorCode: "Код ошибки (если есть)",
+    reqMedia: "Фото / видео (до 3)",
+    reqMediaHint: "JPG/PNG/WebP или видео. Максимум 3 файла.",
+    reqTime: "Удобное время выезда",
+    reqTimePlaceholder: "Выберите",
+    reqTimeToday: "Сегодня",
+    reqTimeTomorrow: "Завтра",
+    reqTimeSoon: "В ближайшие дни",
+    reqTimeComment: "Комментарий по времени (необязательно)",
+    reqTimeCommentPlaceholder:
+      "Например: после 18:00, до 12:00, выходные…",
+    reqSubmit: "Отправить заявку",
+    reqSending: "Отправляем…",
+    reqSuccessTitle: "Заявка отправлена!",
+    reqSuccessText: "Мастер свяжется с вами в ближайшее время.",
+    reqSendAnother: "Отправить ещё одну",
+    reqValidationRequired: "Заполните обязательные поля.",
+    reqValidationPhone: "Введите корректный номер телефона.",
+    reqValidationMedia: "Можно прикрепить максимум 3 файла.",
+    reqError: "Не удалось отправить. Попробуйте позже или позвоните нам.",
     contactTitle: "Заявка",
     contactLead:
       "Заполните форму — ответим как можно скорее. Телефон и мессенджеры можно указать внизу страницы.",
@@ -185,6 +314,53 @@ export const messages: Record<Locale, Messages> = {
         text: "Correct water and drain hookup, levelling, and a test run after setup.",
       },
     ],
+    requestTitle: "Book a repair",
+    requestLead:
+      "Fill in the form — details go straight to the technician in Telegram. The clearer the request, the faster the diagnosis and visit.",
+    requestFormTitle: "Book a washing machine repair",
+    requestFormHint:
+      "Fields marked with * are required. Attach photos/videos if you can — it helps a lot.",
+    reqName: "Name",
+    reqPhone: "Phone",
+    reqAddress: "Full address (optional)",
+    reqBrand: "Washer brand",
+    reqBrandOther: "Other",
+    reqBrandUnknown: "I don’t know",
+    reqBrandPlaceholder: "Select a brand",
+    reqModel: "Model (optional)",
+    reqIssue: "What happened?",
+    reqIssuePlaceholder:
+      "Describe symptoms, when it started, what you’ve tried…",
+    reqIssueHintsLabel: "Quick hints",
+    reqIssueHints: [
+      "Doesn’t drain",
+      "Doesn’t heat",
+      "Very loud",
+      "Won’t turn on",
+      "Leaking",
+      "Shows an error",
+      "Strong vibration",
+      "Burning smell",
+    ],
+    reqErrorCode: "Error code (if any)",
+    reqMedia: "Photos / video (up to 3)",
+    reqMediaHint: "JPG/PNG/WebP or video. Max 3 files.",
+    reqTime: "Preferred time",
+    reqTimePlaceholder: "Select",
+    reqTimeToday: "Today",
+    reqTimeTomorrow: "Tomorrow",
+    reqTimeSoon: "In the next few days",
+    reqTimeComment: "Time comment (optional)",
+    reqTimeCommentPlaceholder: "E.g. after 6pm, before noon, weekend…",
+    reqSubmit: "Send request",
+    reqSending: "Sending…",
+    reqSuccessTitle: "Request sent!",
+    reqSuccessText: "The technician will contact you shortly.",
+    reqSendAnother: "Send another request",
+    reqValidationRequired: "Please fill in the required fields.",
+    reqValidationPhone: "Please enter a valid phone number.",
+    reqValidationMedia: "You can attach up to 3 files.",
+    reqError: "Couldn’t send. Try again later or call us.",
     contactTitle: "Contact",
     contactLead:
       "Send the form — we’ll get back to you as soon as we can. Phone and messengers can be added in the footer.",

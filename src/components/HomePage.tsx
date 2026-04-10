@@ -3,6 +3,7 @@
 import { Header } from "./Header";
 import { HeroVisual } from "./HeroVisual";
 import { ContactForm } from "./ContactForm";
+import { RepairRequestForm } from "./RepairRequestForm";
 import { ServiceIcon, serviceIconAccent } from "./ServiceIcon";
 import { useLocale } from "./LocaleProvider";
 
@@ -29,7 +30,7 @@ export function HomePage() {
                 {t.heroSubtitle}
               </p>
               <a
-                href="#contact"
+                href="#request"
                 className="inline-flex w-fit items-center rounded-full border border-cyan-400/40 bg-cyan-500/10 px-6 py-3 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-500/20 hover:shadow-[0_0_24px_rgba(34,211,238,0.2)]"
               >
                 {t.heroCta}
@@ -37,6 +38,23 @@ export function HomePage() {
             </div>
             <div className="flex justify-center lg:justify-end">
               <HeroVisual />
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="request"
+          className="border-t border-white/10 bg-black/20 px-4 py-20 sm:px-6"
+        >
+          <div className="mx-auto max-w-6xl text-center">
+            <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-wide text-white sm:text-3xl">
+              {t.requestTitle}
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-zinc-400">
+              {t.requestLead}
+            </p>
+            <div className="mt-10">
+              <RepairRequestForm />
             </div>
           </div>
         </section>

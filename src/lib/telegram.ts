@@ -56,3 +56,36 @@ export async function sendTelegramHtml(html: string): Promise<{
   const json = (await tgRes.json()) as { ok?: boolean; description?: string };
   return { ok: tgRes.ok && !!json.ok, json, status: tgRes.status };
 }
+
+export type TelegramMediaKind = "photo" | "video";
+
+export async function sendTelegramMediaGroup(params: {
+  media: { kind: TelegramMediaKind; file: File; filename?: string }[];
+}): Promise<{
+  ok: boolean;
+  json: { ok?: boolean; description?: string };
+  status: number;
+}> {
+  const { token, chatId } = getTelegramEnv();
+  if (!token || !chatId) {
+    return { ok: false, json: { description: "not configured" }, status: 503 };
+  }
+  if (params.media.length === 0) {
+    return { ok: true, json: { ok: true }, status: 200 };
+  }
+
+  const tgUrl = `https://api.telegram.org/bot${token}/sendMediaGroup`;
+  const fd = new FormData();
+  fd.set("chat_id", String(chatId));
+
+  const mediaJson = params.media.map((m, i) => {
+    const attachName = `file${i + 1}`;
+    fd.append(attachName, m.file, m.filename || m.file.name || attachName);
+    return { type: m.kind, media: `attach://${attachName}` };
+  });
+  fd.set("media", JSON.stringify(mediaJson));
+
+  const tgRes = await fetch(tgUrl, { method: "POST", body: fd });
+  const json = (await tgRes.json()) as { ok?: boolean; description?: string };
+  return { ok: tgRes.ok && !!json.ok, json, status: tgRes.status };
+}
