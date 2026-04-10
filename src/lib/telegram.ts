@@ -57,6 +57,65 @@ export async function sendTelegramHtml(html: string): Promise<{
   return { ok: tgRes.ok && !!json.ok, json, status: tgRes.status };
 }
 
+export async function telegramCall<T>(method: string, body: unknown): Promise<{
+  ok: boolean;
+  json: any;
+  status: number;
+}> {
+  const { token } = getTelegramEnv();
+  if (!token) return { ok: false, json: { description: "not configured" }, status: 503 };
+  const url = `https://api.telegram.org/bot${token}/${method}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const json = (await res.json().catch(() => ({}))) as T;
+  return { ok: res.ok && !!(json as any)?.ok, json, status: res.status };
+}
+
+export async function sendTelegramMessage(params: {
+  chat_id: string | number;
+  text: string;
+  parse_mode?: "HTML";
+  reply_markup?: unknown;
+  link_preview_options?: { is_disabled?: boolean };
+}): Promise<{
+  ok: boolean;
+  json: any;
+  status: number;
+}> {
+  return telegramCall("sendMessage", {
+    chat_id: params.chat_id,
+    text: params.text,
+    parse_mode: params.parse_mode ?? "HTML",
+    reply_markup: params.reply_markup,
+    link_preview_options: params.link_preview_options ?? { is_disabled: true },
+  });
+}
+
+export async function editTelegramMessageText(params: {
+  chat_id: string | number;
+  message_id: number;
+  text: string;
+  parse_mode?: "HTML";
+  reply_markup?: unknown;
+  link_preview_options?: { is_disabled?: boolean };
+}): Promise<{
+  ok: boolean;
+  json: any;
+  status: number;
+}> {
+  return telegramCall("editMessageText", {
+    chat_id: params.chat_id,
+    message_id: params.message_id,
+    text: params.text,
+    parse_mode: params.parse_mode ?? "HTML",
+    reply_markup: params.reply_markup,
+    link_preview_options: params.link_preview_options ?? { is_disabled: true },
+  });
+}
+
 export type TelegramMediaKind = "photo" | "video";
 
 export async function sendTelegramMediaGroup(params: {

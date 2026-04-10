@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
-import { escapeHtml, sendTelegramHtml, sendTelegramMediaGroup } from "@/lib/telegram";
+import {
+  getTelegramEnv,
+  sendTelegramMediaGroup,
+  sendTelegramMessage,
+} from "@/lib/telegram";
 import { isLocale } from "@/lib/i18n";
+import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
+import { formatOrderHtml, orderKeyboard, type OrderStatus } from "@/lib/orders";
 
 const MAX_FILES = 3;
 const MAX_FILE_BYTES = 25 * 1024 * 1024; // keep within typical Telegram limits
@@ -34,13 +40,6 @@ function asString(v: FormDataEntryValue | null): string {
 
 function digitsOnly(s: string) {
   return s.replace(/\D/g, "");
-}
-
-function timeLabel(v: string) {
-  if (v === "today") return "Сегодня / Today";
-  if (v === "tomorrow") return "Завтра / Tomorrow";
-  if (v === "soon") return "В ближайшие дни / Next days";
-  return v;
 }
 
 export async function POST(request: Request) {
@@ -124,49 +123,67 @@ export async function POST(request: Request) {
     }
   }
 
-  const brandLine =
-    brand === "other"
-      ? brandOther
-        ? `🧺 <b>Марка:</b> ${escapeHtml(brandOther)}`
-        : `🧺 <b>Марка:</b> Другая (не указана)`
-      : brand === "unknown"
-        ? `🧺 <b>Марка:</b> Не знаю`
-        : brand
-          ? `🧺 <b>Марка:</b> ${escapeHtml(brand)}`
-          : `🧺 <b>Марка:</b> —`;
+  // Create order in Supabase (mini-CRM storage)
+  const supabaseAdmin = getSupabaseAdmin();
+  const { data: inserted, error: insErr } = await supabaseAdmin
+    .from("orders")
+    .insert({
+      status: "new" as OrderStatus,
+      locale,
+      name,
+      phone,
+      address: address || null,
+      brand:
+        brand === "other"
+          ? brandOther || null
+          : brand === "unknown"
+            ? "Не знаю"
+            : brand || null,
+      model: model || null,
+      issue,
+      error_code: errorCode || null,
+      preferred_window: (time || null) as any,
+      preferred_comment: timeComment || null,
+    })
+    .select("*")
+    .single();
 
-  const header = [
-    "🛠️ <b>Заявка на ремонт стиральной машины</b>",
-    "━━━━━━━━━━━━━━━━━━━━",
-  ].join("\n");
+  if (insErr || !inserted) {
+    console.error("[api/repair-request] supabase insert error", insErr);
+    return NextResponse.json({ error: "Storage error" }, { status: 502 });
+  }
 
-  const text = [
-    header,
-    `👤 <b>Имя:</b> ${escapeHtml(name)}`,
-    `📞 <b>Телефон:</b> ${escapeHtml(phone)}`,
-    address ? `📍 <b>Адрес:</b> ${escapeHtml(address)}` : `📍 <b>Адрес:</b> —`,
-    brandLine,
-    model ? `🔎 <b>Модель:</b> ${escapeHtml(model)}` : `🔎 <b>Модель:</b> —`,
-    "━━━━━━━━━━━━━━━━━━━━",
-    `🧰 <b>Проблема:</b>\n${escapeHtml(issue)}`,
-    errorCode ? `⚠️ <b>Код ошибки:</b> ${escapeHtml(errorCode)}` : "",
-    "━━━━━━━━━━━━━━━━━━━━",
-    `🕒 <b>Время:</b> ${escapeHtml(timeLabel(time))}`,
-    timeComment ? `📝 <b>Комментарий:</b> ${escapeHtml(timeComment)}` : "",
-    "",
-    `🌐 <b>Locale:</b> ${escapeHtml(locale)}`,
-  ]
-    .filter(Boolean)
-    .join("\n");
-
-  const msg = await sendTelegramHtml(text);
-  if (!msg.ok) {
+  // Send Telegram "card" with inline buttons
+  const { chatId } = getTelegramEnv();
+  if (!chatId) {
     if (process.env.NODE_ENV === "development") {
-      console.info("[api/repair-request] Telegram error (dev mock).", msg.json);
+      console.info("[api/repair-request] Telegram not configured — dev mock OK.");
       return NextResponse.json({ ok: true, devMock: true });
     }
+    return NextResponse.json({ error: "Server is not configured for Telegram." }, { status: 503 });
+  }
+
+  const cardText = formatOrderHtml(inserted as any);
+  const msg = await sendTelegramMessage({
+    chat_id: chatId,
+    text: cardText,
+    reply_markup: orderKeyboard(inserted.id, inserted.status),
+  });
+  if (!msg.ok) {
+    console.error("[api/repair-request] Telegram API error", msg.json);
     return NextResponse.json({ error: "Failed to notify" }, { status: 502 });
   }
+
+  // Persist message linkage so we can edit it later from webhook
+  const messageId = msg.json?.result?.message_id as number | undefined;
+  await supabaseAdmin
+    .from("orders")
+    .update({
+      tg_chat_id: String(chatId),
+      tg_message_id: messageId ?? null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", inserted.id);
 
   // Update rate limit only after successful message delivery.
   rm.set(ip, { ts: [...fresh, now], last: now });
