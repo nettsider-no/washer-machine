@@ -131,7 +131,13 @@ function preferredLabel(v: OrderRow["preferred_window"]) {
   if (v === "today") return "Сегодня";
   if (v === "tomorrow") return "Завтра";
   if (v === "soon") return "В ближайшие дни";
-  return "—";
+  return "не указано";
+}
+
+/** Текст для Telegram: пустое поле заявки → «не указано». */
+function disp(raw: string | null | undefined): string {
+  const t = typeof raw === "string" ? raw.trim() : "";
+  return t ? escapeHtml(t) : "не указано";
 }
 
 export function formatOrderHtml(o: OrderRow): string {
@@ -140,25 +146,22 @@ export function formatOrderHtml(o: OrderRow): string {
   parts.push(`🛠️ <b>Заявка</b>  ${statusLabel(o.status)}`);
   parts.push("━━━━━━━━━━━━━━━━━━━━");
 
-  parts.push(`👤 <b>Клиент:</b> ${escapeHtml(o.name)}`);
-  parts.push(`📞 <b>Телефон:</b> ${escapeHtml(o.phone)}`);
-  parts.push(`📍 <b>Адрес:</b> ${o.address ? escapeHtml(o.address) : "—"}`);
-  parts.push(`🧺 <b>Марка:</b> ${o.brand ? escapeHtml(o.brand) : "—"}`);
-  parts.push(`🔎 <b>Модель:</b> ${o.model ? escapeHtml(o.model) : "—"}`);
-  if (o.error_code) parts.push(`⚠️ <b>Код ошибки:</b> ${escapeHtml(o.error_code)}`);
+  parts.push(`👤 <b>Клиент:</b> ${disp(o.name)}`);
+  parts.push(`📞 <b>Телефон:</b> ${disp(o.phone)}`);
+  parts.push(`📍 <b>Адрес:</b> ${disp(o.address)}`);
+  parts.push(`🧺 <b>Марка:</b> ${disp(o.brand)}`);
+  parts.push(`🔎 <b>Модель:</b> ${disp(o.model)}`);
+  parts.push(`⚠️ <b>Код ошибки:</b> ${disp(o.error_code)}`);
 
   parts.push("━━━━━━━━━━━━━━━━━━━━");
-  parts.push(`🧰 <b>Проблема:</b>\n${escapeHtml(o.issue)}`);
+  parts.push(`🧰 <b>Проблема:</b>\n${disp(o.issue)}`);
 
   parts.push("━━━━━━━━━━━━━━━━━━━━");
-  parts.push(
-    `🗓️ <b>Выезд:</b> ${o.visit_date ? escapeHtml(o.visit_date) : "—"}  ⏰ ${
-      o.visit_time ? escapeHtml(o.visit_time) : "—"
-    }`
-  );
-  parts.push(`🕒 <b>Удобно:</b> ${escapeHtml(preferredLabel(o.preferred_window))}`);
-  if (o.preferred_comment) parts.push(`📝 <b>Комментарий:</b> ${escapeHtml(o.preferred_comment)}`);
-  if (o.visit_comment) parts.push(`🗒️ <b>Детали мастера:</b> ${escapeHtml(o.visit_comment)}`);
+  parts.push(`🕒 <b>Когда удобно:</b> ${escapeHtml(preferredLabel(o.preferred_window))}`);
+  parts.push(`📝 <b>Комментарий к времени:</b> ${disp(o.preferred_comment)}`);
+  if (o.visit_comment?.trim()) {
+    parts.push(`🗒️ <b>Детали мастера:</b> ${escapeHtml(o.visit_comment.trim())}`);
+  }
 
   parts.push("");
   parts.push(`🆔 <code>${escapeHtml(o.id)}</code>`);
