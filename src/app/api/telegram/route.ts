@@ -24,6 +24,7 @@ import {
 } from "@/lib/telegram";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 type TgUpdate = {
   update_id: number;
@@ -59,11 +60,6 @@ async function refreshCard(o: OrderRow) {
 }
 
 export async function POST(request: Request) {
-  const secret = request.headers.get("x-telegram-bot-api-secret-token");
-  if (process.env.TELEGRAM_WEBHOOK_SECRET && secret !== process.env.TELEGRAM_WEBHOOK_SECRET) {
-    return NextResponse.json({ ok: true });
-  }
-
   let update: TgUpdate;
   try {
     update = (await request.json()) as TgUpdate;
@@ -71,26 +67,55 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
+  const expected = process.env.TELEGRAM_WEBHOOK_SECRET?.trim();
+  const got = request.headers.get("x-telegram-bot-api-secret-token")?.trim();
+  if (expected && got !== expected) {
+    console.error("[api/telegram] webhook secret mismatch (check setWebhook secret_token vs Vercel TELEGRAM_WEBHOOK_SECRET)");
+    if (update.callback_query?.id) {
+      await answerCallbackQuery({
+        callback_query_id: update.callback_query.id,
+        text: "Вебхук: неверный secret. Сверь TELEGRAM_WEBHOOK_SECRET в Vercel и secret_token в setWebhook.",
+        show_alert: true,
+      });
+    }
+    return NextResponse.json({ ok: true });
+  }
+
   if (update.callback_query) {
     const cq = update.callback_query;
-    let callbackAcked = false;
+    const replyChat = cq.message?.chat.id;
+
+    // Снимаем «загрузку» сразу — до БД и остальных запросов к Telegram.
+    await answerCallbackQuery({ callback_query_id: cq.id });
+
     try {
       const raw = cq.data ?? "";
       const cb = parseCallbackData(raw);
       if (!cb) {
+        if (replyChat) {
+          await sendTelegramMessage({
+            chat_id: replyChat,
+            text: "Кнопка устарела или битая. Нужна <b>новая заявка</b> с сайта (старые карточки до обновления могут не работать).",
+          });
+        }
         return NextResponse.json({ ok: true });
       }
 
       const order = await loadOrderById(cb.id);
       if (!order) {
+        if (replyChat) {
+          await sendTelegramMessage({
+            chat_id: replyChat,
+            text: "Заявка не найдена в базе.",
+          });
+        }
         return NextResponse.json({ ok: true });
       }
 
       if (cb.a === "edit") {
-        const chatId = cq.message?.chat.id;
-        if (chatId) {
+        if (replyChat) {
           await sendTelegramMessage({
-            chat_id: chatId,
+            chat_id: replyChat,
             text: "✏️ <b>Редактирование</b>\nВыбери поле:",
             reply_markup: editMenuKeyboard(order.id),
           });
@@ -109,15 +134,14 @@ export async function POST(request: Request) {
           { mode: "edit", orderId: order.id, field: cb.f },
           new Date(Date.now() + 10 * 60_000)
         );
-        const chatId = cq.message?.chat.id;
-        if (chatId) {
+        if (replyChat) {
           const prompt =
             cb.f === "date"
               ? "Введите дату выезда в формате <code>YYYY-MM-DD</code> (пример: <code>2026-04-10</code>)."
               : cb.f === "time"
                 ? "Введите время выезда в формате <code>HH:MM</code> (пример: <code>18:30</code>)."
                 : "Введите комментарий / дополнительные детали (одно сообщение).";
-          await sendTelegramMessage({ chat_id: chatId, text: prompt });
+          await sendTelegramMessage({ chat_id: replyChat, text: prompt });
         }
         return NextResponse.json({ ok: true });
       }
@@ -136,17 +160,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true });
     } catch (e) {
       console.error("[api/telegram] callback error", e);
-      await answerCallbackQuery({
-        callback_query_id: cq.id,
-        text: "Ошибка сервера. Попробуй ещё раз.",
-        show_alert: true,
-      });
-      callbackAcked = true;
-      return NextResponse.json({ ok: true });
-    } finally {
-      if (!callbackAcked) {
-        await answerCallbackQuery({ callback_query_id: cq.id });
+      if (replyChat) {
+        await sendTelegramMessage({
+          chat_id: replyChat,
+          text: "Ошибка сервера. Попробуй через минуту или проверь логи Vercel.",
+        });
       }
+      return NextResponse.json({ ok: true });
     }
   }
 

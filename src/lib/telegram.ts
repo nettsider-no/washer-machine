@@ -122,11 +122,15 @@ export async function answerCallbackQuery(params: {
   text?: string;
   show_alert?: boolean;
 }): Promise<void> {
-  await telegramCall("answerCallbackQuery", {
-    callback_query_id: params.callback_query_id,
-    ...(params.text ? { text: params.text.slice(0, 200) } : {}),
-    show_alert: params.show_alert ?? false,
-  });
+  try {
+    await telegramCall("answerCallbackQuery", {
+      callback_query_id: params.callback_query_id,
+      ...(params.text ? { text: params.text.slice(0, 200) } : {}),
+      show_alert: params.show_alert ?? false,
+    });
+  } catch (e) {
+    console.error("[telegram] answerCallbackQuery failed", e);
+  }
 }
 
 export type TelegramMediaKind = "photo" | "video";
