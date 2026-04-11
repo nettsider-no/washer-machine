@@ -32,6 +32,13 @@ create table if not exists public.orders (
 create index if not exists orders_status_idx on public.orders(status);
 create index if not exists orders_visit_idx on public.orders(visit_date, visit_time);
 
+-- Один активный заказ на пару visit_date + visit_time (защита от двойной брони).
+create unique index if not exists orders_active_visit_slot_unique
+  on public.orders (visit_date, visit_time)
+  where status in ('new', 'in_progress')
+    and visit_date is not null
+    and visit_time is not null;
+
 create table if not exists public.tg_sessions (
   user_id bigint primary key,
   session jsonb not null,

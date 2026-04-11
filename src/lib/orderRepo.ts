@@ -1,5 +1,6 @@
 import { getPool } from "@/lib/db";
 import type { OrderRow, OrderStatus } from "@/lib/orders";
+import { slotId } from "@/lib/slotUtils";
 
 function mapRow(r: Record<string, unknown>): OrderRow {
   return {
@@ -67,6 +68,25 @@ export async function insertOrder(params: {
   );
   if (!rows[0]) throw new Error("insert returned no row");
   return mapRow(rows[0] as Record<string, unknown>);
+}
+
+/** Слоты с активной заявкой (новая / в работе) — не показываем в форме и не бронируем повторно. */
+export async function getTakenVisitSlotKeys(): Promise<Set<string>> {
+  const pool = getPool();
+  const { rows } = await pool.query(
+    `SELECT visit_date, visit_time FROM orders
+     WHERE visit_date IS NOT NULL AND visit_time IS NOT NULL
+       AND status IN ('new', 'in_progress')`
+  );
+  const set = new Set<string>();
+  for (const r of rows as { visit_date: string; visit_time: string }[]) {
+    const vd = String(r.visit_date ?? "").trim();
+    const vt = String(r.visit_time ?? "").trim();
+    const hh = parseInt(vt.split(":")[0] ?? "", 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(vd) || !Number.isFinite(hh)) continue;
+    set.add(slotId(vd, hh));
+  }
+  return set;
 }
 
 export async function updateOrderTelegramMeta(

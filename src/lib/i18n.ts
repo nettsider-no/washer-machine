@@ -71,8 +71,10 @@ export type Messages = {
   reqVisitSlot: string;
   reqVisitSlotPlaceholder: string;
   reqTimezoneNote: string;
-  reqTimeComment: string;
-  reqTimeCommentPlaceholder: string;
+  /** Слот только что заняли или недоступен. */
+  reqSlotTaken: string;
+  reqSlotPickDate: string;
+  reqSlotPickTime: string;
   reqSubmit: string;
   reqSending: string;
   reqSuccessTitle: string;
@@ -168,8 +170,10 @@ export const messages: Record<Locale, Messages> = {
     reqVisitSlot: "Ønsket tidspunkt for besøk",
     reqVisitSlotPlaceholder: "Velg dato og klokkeslett",
     reqTimezoneNote: "Tider vises i norsk tid (Europe/Oslo).",
-    reqTimeComment: "Kommentar til tidspunkt (valgfritt)",
-    reqTimeCommentPlaceholder: "F.eks. etter 18:00, før 12:00, helg…",
+    reqSlotTaken:
+      "Dette tidspunktet er nettopp tatt. Velg et annet tidspunkt — listen oppdateres.",
+    reqSlotPickDate: "1. Velg dag",
+    reqSlotPickTime: "2. Velg klokkeslett",
     reqSubmit: "Send bestilling",
     reqSending: "Sender…",
     reqSuccessTitle: "Bestillingen er sendt!",
@@ -265,9 +269,10 @@ export const messages: Record<Locale, Messages> = {
     reqVisitSlot: "Удобное время визита",
     reqVisitSlotPlaceholder: "Выберите дату и время",
     reqTimezoneNote: "Время указано по Норвегии (Europe/Oslo).",
-    reqTimeComment: "Комментарий по времени (необязательно)",
-    reqTimeCommentPlaceholder:
-      "Например: после 18:00, до 12:00, выходные…",
+    reqSlotTaken:
+      "Это время только что заняли. Выберите другой слот — список обновляется автоматически.",
+    reqSlotPickDate: "1. Выберите дату",
+    reqSlotPickTime: "2. Выберите время",
     reqSubmit: "Отправить заявку",
     reqSending: "Отправляем…",
     reqSuccessTitle: "Заявка отправлена!",
@@ -363,8 +368,10 @@ export const messages: Record<Locale, Messages> = {
     reqVisitSlot: "Preferred visit time",
     reqVisitSlotPlaceholder: "Pick date and time",
     reqTimezoneNote: "Times are shown in Norway (Europe/Oslo).",
-    reqTimeComment: "Time comment (optional)",
-    reqTimeCommentPlaceholder: "E.g. after 6pm, before noon, weekend…",
+    reqSlotTaken:
+      "That time was just taken. Please pick another slot — the list refreshes automatically.",
+    reqSlotPickDate: "1. Pick a date",
+    reqSlotPickTime: "2. Pick a time",
     reqSubmit: "Send request",
     reqSending: "Sending…",
     reqSuccessTitle: "Request sent!",

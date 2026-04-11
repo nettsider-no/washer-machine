@@ -167,7 +167,9 @@ export function formatOrderHtml(o: OrderRow): string {
   } else {
     parts.push(`🕒 <b>Когда удобно:</b> не указано`);
   }
-  parts.push(`📝 <b>Комментарий к времени:</b> ${disp(o.preferred_comment)}`);
+  if (o.preferred_comment?.trim()) {
+    parts.push(`📝 <b>Комментарий к времени:</b> ${escapeHtml(o.preferred_comment.trim())}`);
+  }
   if (o.visit_comment?.trim()) {
     parts.push(`🗒️ <b>Детали мастера:</b> ${escapeHtml(o.visit_comment.trim())}`);
   }

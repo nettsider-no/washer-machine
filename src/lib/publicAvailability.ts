@@ -1,4 +1,5 @@
 import { getVisitSlotsFromDb } from "@/lib/appSettingsRepo";
+import { getTakenVisitSlotKeys } from "@/lib/orderRepo";
 import {
   formatSlotLabel,
   isSlotInFutureOslo,
@@ -13,7 +14,10 @@ import {
 export type PublicSlot = { id: string; label: string };
 
 export async function getPublicSlots(locale: string): Promise<PublicSlot[]> {
-  const raw = await getVisitSlotsFromDb();
+  const [raw, taken] = await Promise.all([
+    getVisitSlotsFromDb(),
+    getTakenVisitSlotKeys(),
+  ]);
   const seen = new Set<string>();
   const future: SlotDef[] = [];
   for (const s of raw) {
@@ -21,6 +25,7 @@ export async function getPublicSlots(locale: string): Promise<PublicSlot[]> {
     if (s.h < SLOT_HOUR_START || s.h > SLOT_HOUR_END_INCLUSIVE) continue;
     if (!isSlotInFutureOslo(s)) continue;
     const id = slotId(s.d, s.h);
+    if (taken.has(id)) continue;
     if (seen.has(id)) continue;
     seen.add(id);
     future.push(s);
@@ -32,10 +37,15 @@ export async function getPublicSlots(locale: string): Promise<PublicSlot[]> {
   }));
 }
 
-export async function isAllowedSlotKey(slotKey: string): Promise<boolean> {
+/** Слот из админки, в будущем и ещё не занят активной заявкой. */
+export async function isSlotBookable(slotKey: string): Promise<boolean> {
   const parsed = parseSlotId(slotKey);
   if (!parsed || !isSlotInFutureOslo(parsed)) return false;
-  const allowed = await getVisitSlotsFromDb();
+  const [allowed, taken] = await Promise.all([
+    getVisitSlotsFromDb(),
+    getTakenVisitSlotKeys(),
+  ]);
   const id = slotId(parsed.d, parsed.h);
-  return allowed.some((s) => slotId(s.d, s.h) === id);
+  if (!allowed.some((s) => slotId(s.d, s.h) === id)) return false;
+  return !taken.has(id);
 }

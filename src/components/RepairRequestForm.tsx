@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IMaskInput } from "react-imask";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -37,6 +37,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { VisitSlotPicker } from "./VisitSlotPicker";
 
 const BRANDS = [
   "Samsung",
@@ -76,15 +77,6 @@ export function RepairRequestForm() {
     startedAtRef.current = Date.now();
   }, []);
 
-  useEffect(() => {
-    fetch(`/api/availability?locale=${encodeURIComponent(locale)}`)
-      .then((r) => r.json())
-      .then((j: { slots?: PublicSlot[] }) => {
-        setAvailSlots(Array.isArray(j.slots) ? j.slots : []);
-      })
-      .catch(() => setAvailSlots([]));
-  }, [locale]);
-
   const schema = useMemo(
     () =>
       z
@@ -106,7 +98,6 @@ export function RepairRequestForm() {
           errorCode: z.string().trim().optional(),
           time: z.enum(["today", "tomorrow", "soon"]).optional(),
           slotKey: z.string().optional(),
-          timeComment: z.string().trim().optional(),
           website: z.string().optional(),
           startedAt: z.string().optional(),
         })
@@ -148,12 +139,50 @@ export function RepairRequestForm() {
       errorCode: "",
       time: "soon",
       slotKey: "",
-      timeComment: "",
       website: "",
       startedAt: "",
     },
     mode: "onBlur",
   });
+
+  const loadAvailability = useCallback(() => {
+    return fetch(`/api/availability?locale=${encodeURIComponent(locale)}`)
+      .then((r) => r.json())
+      .then((j: { slots?: PublicSlot[] }) => {
+        const next = Array.isArray(j.slots) ? j.slots : [];
+        setAvailSlots(next);
+        const cur = form.getValues("slotKey");
+        if (cur?.trim() && !next.some((s) => s.id === cur)) {
+          form.setValue("slotKey", "", { shouldValidate: true });
+        }
+        return next;
+      })
+      .catch(() => {
+        setAvailSlots([]);
+      });
+  }, [locale, form]);
+
+  useEffect(() => {
+    void loadAvailability();
+  }, [loadAvailability]);
+
+  /**
+   * Обновление слотов каждые ~2 с (на Vercel без отдельного WebSocket-сервера
+   * это ближайший аналог «лайва»; push как в мессенджере = Pusher/Ably + подписка).
+   */
+  useEffect(() => {
+    if (!useSlots) return;
+    const id = window.setInterval(() => void loadAvailability(), 2_000);
+    return () => window.clearInterval(id);
+  }, [useSlots, loadAvailability]);
+
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === "visible" && useSlots) void loadAvailability();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [useSlots, loadAvailability]);
 
   const brand = form.watch("brand");
 
@@ -218,7 +247,6 @@ export function RepairRequestForm() {
         fd.set("slotKey", "");
         fd.set("time", values.time ?? "soon");
       }
-      fd.set("timeComment", values.timeComment?.trim() ?? "");
       fd.set("startedAt", String(startedAtRef.current));
       for (const f of files) fd.append("media", f, f.name);
 
@@ -230,6 +258,12 @@ export function RepairRequestForm() {
         code?: string;
       };
       if (!res.ok || !json.ok) {
+        if (json.code === "slot_taken" || res.status === 409) {
+          setServerError(t.reqSlotTaken);
+          void loadAvailability();
+          setSubmitState("error");
+          return;
+        }
         const extra =
           json.detail || json.code
             ? ` (${[json.code, json.detail].filter(Boolean).join(": ")})`
@@ -239,6 +273,7 @@ export function RepairRequestForm() {
         return;
       }
 
+      void loadAvailability();
       form.reset();
       setFiles([]);
       startedAtRef.current = Date.now();
@@ -423,7 +458,12 @@ export function RepairRequestForm() {
             )}
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div
+            className={cn(
+              "grid gap-4",
+              !useSlots && "sm:grid-cols-2"
+            )}
+          >
             <div>
               <Label htmlFor="rr-error">{t.reqErrorCode}</Label>
               <Input id="rr-error" {...form.register("errorCode")} />
@@ -435,24 +475,20 @@ export function RepairRequestForm() {
                 <p className="mt-2 text-sm text-zinc-500">…</p>
               ) : useSlots ? (
                 <>
-                  <Select
-                    value={form.watch("slotKey") || undefined}
-                    onValueChange={(v) =>
-                      form.setValue("slotKey", v, { shouldDirty: true, shouldValidate: true })
+                  <VisitSlotPicker
+                    slots={availSlots}
+                    value={form.watch("slotKey") ?? ""}
+                    onChange={(id) =>
+                      form.setValue("slotKey", id, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
                     }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t.reqVisitSlotPlaceholder} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availSlots.map((s) => (
-                        <SelectItem key={s.id} value={s.id}>
-                          {s.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="mt-1.5 text-xs text-zinc-500">{t.reqTimezoneNote}</p>
+                    locale={locale}
+                    pickDateLabel={t.reqSlotPickDate}
+                    pickTimeLabel={t.reqSlotPickTime}
+                  />
+                  <p className="mt-3 text-xs text-zinc-500">{t.reqTimezoneNote}</p>
                   {form.formState.errors.slotKey?.message && (
                     <p className="mt-1 text-xs text-amber-300">
                       {form.formState.errors.slotKey.message}
@@ -487,15 +523,6 @@ export function RepairRequestForm() {
                 </>
               )}
             </div>
-          </div>
-
-          <div>
-            <Label htmlFor="rr-time-comment">{t.reqTimeComment}</Label>
-            <Input
-              id="rr-time-comment"
-              placeholder={t.reqTimeCommentPlaceholder}
-              {...form.register("timeComment")}
-            />
           </div>
 
           <div>

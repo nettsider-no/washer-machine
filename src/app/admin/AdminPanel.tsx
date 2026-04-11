@@ -195,6 +195,11 @@ export function AdminPanel() {
             Часовой пояс: <b>Europe/Oslo</b> (Норвегия). Отметьте часы, когда можете принять выезд.
             На сайте клиенты увидят только эти окна.
           </p>
+          <p className="mt-2 max-w-xl text-sm text-zinc-500">
+            В любой момент можно <b>снять</b> галочку с часа или <b>добавить</b> новые — нажмите
+            «Сохранить слоты». Изменения подхватываются на сайте в течение пары секунд (у
+            открытой формы).
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button type="button" variant="secondary" onClick={() => void load()}>

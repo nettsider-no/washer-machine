@@ -11,7 +11,7 @@ import {
   updateOrderTelegramMeta,
 } from "@/lib/orderRepo";
 import { formatOrderHtml, orderKeyboard, type OrderStatus } from "@/lib/orders";
-import { isAllowedSlotKey } from "@/lib/publicAvailability";
+import { isSlotBookable } from "@/lib/publicAvailability";
 import { parseSlotId } from "@/lib/slotUtils";
 
 export const runtime = "nodejs";
@@ -100,7 +100,6 @@ export async function POST(request: Request) {
   const errorCode = asString(fd.get("errorCode")).trim();
   const time = asString(fd.get("time")).trim();
   const slotKey = asString(fd.get("slotKey")).trim();
-  const timeComment = asString(fd.get("timeComment")).trim();
 
   if (!name || !phone || !issue) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
@@ -138,9 +137,12 @@ export async function POST(request: Request) {
     let visitTime: string | null = null;
 
     if (slotKey) {
-      const allowed = await isAllowedSlotKey(slotKey);
-      if (!allowed) {
-        return NextResponse.json({ error: "Invalid or unavailable time slot" }, { status: 400 });
+      const bookable = await isSlotBookable(slotKey);
+      if (!bookable) {
+        return NextResponse.json(
+          { ok: false, error: "slot_taken", code: "slot_taken" },
+          { status: 409 }
+        );
       }
       const parsed = parseSlotId(slotKey);
       if (!parsed) {
@@ -172,11 +174,18 @@ export async function POST(request: Request) {
       issue,
       error_code: errorCode || null,
       preferred_window: preferredWindow,
-      preferred_comment: timeComment || null,
+      preferred_comment: null,
       visit_date: visitDate,
       visit_time: visitTime,
     });
   } catch (e) {
+    const pg = e as { code?: string };
+    if (pg?.code === "23505") {
+      return NextResponse.json(
+        { ok: false, error: "slot_taken", code: "slot_taken" },
+        { status: 409 }
+      );
+    }
     const msg = e instanceof Error ? e.message : String(e);
     console.error("[api/repair-request] db error", e);
     if (msg.includes("Missing DATABASE_URL")) {
