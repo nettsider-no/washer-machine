@@ -168,7 +168,11 @@ export async function POST(request: Request) {
       if (cb.a === "cancel") nextStatus = "cancelled";
 
       if (nextStatus) {
-        const updated = await patchOrder(order.id, { status: nextStatus });
+        const patch =
+          nextStatus === "cancelled"
+            ? { status: nextStatus, visit_date: null as string | null, visit_time: null as string | null }
+            : { status: nextStatus };
+        const updated = await patchOrder(order.id, patch);
         await refreshCard(updated, cardRef);
         return NextResponse.json({ ok: true });
       }

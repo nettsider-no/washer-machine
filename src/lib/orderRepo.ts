@@ -164,6 +164,19 @@ export async function listActiveOrders(): Promise<OrderRow[]> {
   return rows.map((r) => mapRow(r as Record<string, unknown>));
 }
 
+/** Активные заявки для админки (новые и в работе). */
+export async function listRecentOrdersForAdmin(limit = 60): Promise<OrderRow[]> {
+  const pool = getPool();
+  const { rows } = await pool.query(
+    `SELECT * FROM orders
+     WHERE status IN ('new', 'in_progress')
+     ORDER BY created_at DESC
+     LIMIT $1`,
+    [limit]
+  );
+  return rows.map((r) => mapRow(r as Record<string, unknown>));
+}
+
 export async function upsertTgSession(
   userId: number,
   session: unknown,
