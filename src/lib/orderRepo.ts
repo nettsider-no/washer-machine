@@ -1,6 +1,6 @@
 import { getPool } from "@/lib/db";
 import type { OrderRow, OrderStatus } from "@/lib/orders";
-import { slotId } from "@/lib/slotUtils";
+import { visitFieldsToSlotKey } from "@/lib/slotUtils";
 
 function mapRow(r: Record<string, unknown>): OrderRow {
   return {
@@ -79,12 +79,9 @@ export async function getTakenVisitSlotKeys(): Promise<Set<string>> {
        AND status IN ('new', 'in_progress')`
   );
   const set = new Set<string>();
-  for (const r of rows as { visit_date: string; visit_time: string }[]) {
-    const vd = String(r.visit_date ?? "").trim();
-    const vt = String(r.visit_time ?? "").trim();
-    const hh = parseInt(vt.split(":")[0] ?? "", 10);
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(vd) || !Number.isFinite(hh)) continue;
-    set.add(slotId(vd, hh));
+  for (const r of rows as { visit_date: unknown; visit_time: unknown }[]) {
+    const key = visitFieldsToSlotKey(r.visit_date, r.visit_time);
+    if (key) set.add(key);
   }
   return set;
 }

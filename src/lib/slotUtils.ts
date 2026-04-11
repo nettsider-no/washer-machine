@@ -21,6 +21,46 @@ export function parseSlotId(id: string): SlotDef | null {
   return { d, h };
 }
 
+/**
+ * Собрать id слота из полей БД (text/date/time как отдаёт node-pg).
+ * Без этого даты-Date или нестандартные строки терялись, и «занято» в админке не совпадало с сайтом.
+ */
+export function visitFieldsToSlotKey(
+  visit_date: unknown,
+  visit_time: unknown
+): string | null {
+  const d = normalizeVisitDateLoose(visit_date);
+  if (!d) return null;
+  const hh = hourFromVisitTimeLoose(visit_time);
+  if (hh == null || !Number.isFinite(hh)) return null;
+  const id = slotId(d, hh);
+  return parseSlotId(id) ? id : null;
+}
+
+function normalizeVisitDateLoose(v: unknown): string | null {
+  if (v == null) return null;
+  if (typeof v === "string") {
+    const t = v.trim();
+    const m = /^(\d{4}-\d{2}-\d{2})/.exec(t);
+    return m ? m[1] : null;
+  }
+  if (v instanceof Date && !Number.isNaN(v.getTime())) {
+    return `${v.getUTCFullYear()}-${String(v.getUTCMonth() + 1).padStart(2, "0")}-${String(v.getUTCDate()).padStart(2, "0")}`;
+  }
+  return null;
+}
+
+function hourFromVisitTimeLoose(v: unknown): number | null {
+  if (v == null) return null;
+  const s = String(v).trim();
+  if (!s) return null;
+  let m = /^(\d{1,2})(?::(\d{2}))?(?::(\d{2}))?(?:\.\d+)?$/.exec(s);
+  if (m) return parseInt(m[1], 10);
+  m = /[T\s](\d{1,2}):(\d{2})/.exec(s);
+  if (m) return parseInt(m[1], 10);
+  return null;
+}
+
 export function slotDateTimeOslo(s: SlotDef): DateTime {
   const [yy, mm, dd] = s.d.split("-").map(Number);
   return DateTime.fromObject(

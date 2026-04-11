@@ -38,18 +38,27 @@ export function AdminPanel() {
       setSavedMsg(null);
     }
     try {
-      const r = await fetch("/api/admin/availability", { credentials: "include" });
+      const r = await fetch("/api/admin/availability", {
+        credentials: "include",
+        cache: "no-store",
+      });
       if (r.status === 401) {
         setAuthed(false);
         setSelected(new Set());
         setBooked(new Set());
         return;
       }
-      const j = (await r.json().catch(() => ({}))) as {
+      if (!r.ok) {
+        return;
+      }
+      const j = (await r.json().catch(() => null)) as {
         ok?: boolean;
         slots?: SlotDef[];
         bookedSlotIds?: string[];
-      };
+      } | null;
+      if (!j?.ok) {
+        return;
+      }
       setAuthed(true);
       setBooked(
         new Set(Array.isArray(j.bookedSlotIds) ? j.bookedSlotIds : [])
@@ -245,7 +254,7 @@ export function AdminPanel() {
               {hours.map((h) => {
                 const id = slotId(d, h);
                 const on = selected.has(id);
-                const isBooked = on && booked.has(id);
+                const isBooked = booked.has(id);
                 return (
                   <button
                     key={id}
@@ -257,7 +266,10 @@ export function AdminPanel() {
                       on &&
                         isBooked &&
                         "border-amber-400/55 bg-amber-500/15 text-amber-100 shadow-[0_0_12px_rgba(245,158,11,0.12)]",
-                      !on && "border-white/10 bg-black/40 text-zinc-400 hover:border-white/20"
+                      !on &&
+                        isBooked &&
+                        "border-amber-500/40 bg-amber-950/30 text-amber-100/90",
+                      !on && !isBooked && "border-white/10 bg-black/40 text-zinc-400 hover:border-white/20"
                     )}
                   >
                     <span>{String(h).padStart(2, "0")}:00</span>
