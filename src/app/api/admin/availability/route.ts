@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { readAdminCookie } from "@/lib/adminAuth";
+import { getTakenVisitSlotKeys } from "@/lib/orderRepo";
 import { getVisitSlotsFromDb, setVisitSlotsInDb } from "@/lib/appSettingsRepo";
 import {
   nextNDatesOslo,
@@ -45,8 +46,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
   try {
-    const slots = await getVisitSlotsFromDb();
-    return NextResponse.json({ ok: true, slots });
+    const [slots, booked] = await Promise.all([
+      getVisitSlotsFromDb(),
+      getTakenVisitSlotKeys(),
+    ]);
+    return NextResponse.json({
+      ok: true,
+      slots,
+      bookedSlotIds: Array.from(booked),
+    });
   } catch (e) {
     console.error("[api/admin/availability GET]", e);
     return NextResponse.json({ ok: false }, { status: 503 });

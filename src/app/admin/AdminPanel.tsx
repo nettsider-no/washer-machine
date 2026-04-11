@@ -30,38 +30,58 @@ export function AdminPanel() {
   const hours = useMemo(() => hourRange(), []);
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [booked, setBooked] = useState<Set<string>>(new Set());
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setSavedMsg(null);
+  const load = useCallback(async (opts?: { silent?: boolean }) => {
+    if (!opts?.silent) {
+      setLoading(true);
+      setSavedMsg(null);
+    }
     try {
       const r = await fetch("/api/admin/availability", { credentials: "include" });
       if (r.status === 401) {
         setAuthed(false);
         setSelected(new Set());
+        setBooked(new Set());
         return;
       }
-      const j = (await r.json().catch(() => ({}))) as { ok?: boolean; slots?: SlotDef[] };
+      const j = (await r.json().catch(() => ({}))) as {
+        ok?: boolean;
+        slots?: SlotDef[];
+        bookedSlotIds?: string[];
+      };
       setAuthed(true);
-      const next = new Set<string>();
-      if (Array.isArray(j.slots)) {
-        for (const s of j.slots) {
-          if (s?.d && typeof s.h === "number") {
-            next.add(slotId(s.d, s.h));
+      setBooked(
+        new Set(Array.isArray(j.bookedSlotIds) ? j.bookedSlotIds : [])
+      );
+      if (!opts?.silent) {
+        const next = new Set<string>();
+        if (Array.isArray(j.slots)) {
+          for (const s of j.slots) {
+            if (s?.d && typeof s.h === "number") {
+              next.add(slotId(s.d, s.h));
+            }
           }
         }
+        setSelected(next);
       }
-      setSelected(next);
     } catch {
-      setAuthed(false);
+      if (!opts?.silent) setAuthed(false);
     } finally {
-      setLoading(false);
+      if (!opts?.silent) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     void load();
   }, [load]);
+
+  /** Брони обновляются без перезагрузки страницы (тихий опрос). */
+  useEffect(() => {
+    if (!authed) return;
+    const id = window.setInterval(() => void load({ silent: true }), 10_000);
+    return () => window.clearInterval(id);
+  }, [authed, load]);
 
   function toggle(d: string, h: number) {
     const id = slotId(d, h);
@@ -126,6 +146,7 @@ export function AdminPanel() {
         return;
       }
       setSavedMsg("Сохранено");
+      void load({ silent: true });
     } catch {
       setSavedMsg("Ошибка сети");
     } finally {
@@ -137,6 +158,7 @@ export function AdminPanel() {
     await fetch("/api/admin/logout", { method: "POST", credentials: "include" });
     setAuthed(false);
     setSelected(new Set());
+    setBooked(new Set());
   }
 
   function dayTitle(isoDate: string): string {
@@ -198,7 +220,8 @@ export function AdminPanel() {
           <p className="mt-2 max-w-xl text-sm text-zinc-500">
             В любой момент можно <b>снять</b> галочку с часа или <b>добавить</b> новые — нажмите
             «Сохранить слоты». Изменения подхватываются на сайте в течение пары секунд (у
-            открытой формы).
+            открытой формы). Список броней подтягивается <b>сам каждые ~10 секунд</b> — обновлять
+            страницу не нужно (кнопка «Обновить» — если нужно сразу).
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -222,19 +245,27 @@ export function AdminPanel() {
               {hours.map((h) => {
                 const id = slotId(d, h);
                 const on = selected.has(id);
+                const isBooked = on && booked.has(id);
                 return (
                   <button
                     key={id}
                     type="button"
                     onClick={() => toggle(d, h)}
                     className={cn(
-                      "min-w-[4.5rem] rounded-lg border px-2 py-2 text-sm font-medium transition",
-                      on
-                        ? "border-cyan-400/50 bg-cyan-500/20 text-cyan-100"
-                        : "border-white/10 bg-black/40 text-zinc-400 hover:border-white/20"
+                      "flex min-w-[4.5rem] flex-col items-center justify-center rounded-lg border px-2 py-1.5 text-sm font-medium transition",
+                      on && !isBooked && "border-cyan-400/50 bg-cyan-500/20 text-cyan-100",
+                      on &&
+                        isBooked &&
+                        "border-amber-400/55 bg-amber-500/15 text-amber-100 shadow-[0_0_12px_rgba(245,158,11,0.12)]",
+                      !on && "border-white/10 bg-black/40 text-zinc-400 hover:border-white/20"
                     )}
                   >
-                    {String(h).padStart(2, "0")}:00
+                    <span>{String(h).padStart(2, "0")}:00</span>
+                    {isBooked && (
+                      <span className="mt-0.5 text-[9px] font-bold uppercase leading-none text-amber-200/95">
+                        Занято
+                      </span>
+                    )}
                   </button>
                 );
               })}
