@@ -39,13 +39,15 @@ export async function insertOrder(params: {
   error_code: string | null;
   preferred_window: "today" | "tomorrow" | "soon" | null;
   preferred_comment: string | null;
+  visit_date: string | null;
+  visit_time: string | null;
 }): Promise<OrderRow> {
   const pool = getPool();
   const { rows } = await pool.query(
     `INSERT INTO orders (
       status, locale, name, phone, address, brand, model, issue, error_code,
-      preferred_window, preferred_comment
-    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+      preferred_window, preferred_comment, visit_date, visit_time
+    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
     RETURNING *`,
     [
       params.status,
@@ -59,6 +61,8 @@ export async function insertOrder(params: {
       params.error_code,
       params.preferred_window,
       params.preferred_comment,
+      params.visit_date,
+      params.visit_time,
     ]
   );
   if (!rows[0]) throw new Error("insert returned no row");

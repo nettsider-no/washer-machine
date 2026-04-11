@@ -157,7 +157,16 @@ export function formatOrderHtml(o: OrderRow): string {
   parts.push(`🧰 <b>Проблема:</b>\n${disp(o.issue)}`);
 
   parts.push("━━━━━━━━━━━━━━━━━━━━");
-  parts.push(`🕒 <b>Когда удобно:</b> ${escapeHtml(preferredLabel(o.preferred_window))}`);
+  const hasSlot = Boolean(o.visit_date?.trim() && o.visit_time?.trim());
+  if (hasSlot) {
+    parts.push(
+      `🗓️ <b>Слот (Europe/Oslo):</b> ${escapeHtml(o.visit_date!)} ${escapeHtml(o.visit_time!)}`
+    );
+  } else if (o.preferred_window) {
+    parts.push(`🕒 <b>Когда удобно:</b> ${escapeHtml(preferredLabel(o.preferred_window))}`);
+  } else {
+    parts.push(`🕒 <b>Когда удобно:</b> не указано`);
+  }
   parts.push(`📝 <b>Комментарий к времени:</b> ${disp(o.preferred_comment)}`);
   if (o.visit_comment?.trim()) {
     parts.push(`🗒️ <b>Детали мастера:</b> ${escapeHtml(o.visit_comment.trim())}`);

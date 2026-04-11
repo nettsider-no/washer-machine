@@ -11,6 +11,8 @@ import {
   updateOrderTelegramMeta,
 } from "@/lib/orderRepo";
 import { formatOrderHtml, orderKeyboard, type OrderStatus } from "@/lib/orders";
+import { isAllowedSlotKey } from "@/lib/publicAvailability";
+import { parseSlotId } from "@/lib/slotUtils";
 
 export const runtime = "nodejs";
 
@@ -97,6 +99,7 @@ export async function POST(request: Request) {
   const issue = asString(fd.get("issue")).trim();
   const errorCode = asString(fd.get("errorCode")).trim();
   const time = asString(fd.get("time")).trim();
+  const slotKey = asString(fd.get("slotKey")).trim();
   const timeComment = asString(fd.get("timeComment")).trim();
 
   if (!name || !phone || !issue) {
@@ -130,8 +133,29 @@ export async function POST(request: Request) {
   let inserted;
   try {
     getDatabaseUrl();
-    const preferredWindow =
-      time === "today" || time === "tomorrow" || time === "soon" ? time : null;
+    let preferredWindow: "today" | "tomorrow" | "soon" | null = null;
+    let visitDate: string | null = null;
+    let visitTime: string | null = null;
+
+    if (slotKey) {
+      const allowed = await isAllowedSlotKey(slotKey);
+      if (!allowed) {
+        return NextResponse.json({ error: "Invalid or unavailable time slot" }, { status: 400 });
+      }
+      const parsed = parseSlotId(slotKey);
+      if (!parsed) {
+        return NextResponse.json({ error: "Invalid time slot" }, { status: 400 });
+      }
+      visitDate = parsed.d;
+      visitTime = `${String(parsed.h).padStart(2, "0")}:00`;
+    } else {
+      preferredWindow =
+        time === "today" || time === "tomorrow" || time === "soon" ? time : null;
+      if (!preferredWindow) {
+        return NextResponse.json({ error: "Missing time preference" }, { status: 400 });
+      }
+    }
+
     inserted = await insertOrder({
       status: "new" as OrderStatus,
       locale,
@@ -149,6 +173,8 @@ export async function POST(request: Request) {
       error_code: errorCode || null,
       preferred_window: preferredWindow,
       preferred_comment: timeComment || null,
+      visit_date: visitDate,
+      visit_time: visitTime,
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);

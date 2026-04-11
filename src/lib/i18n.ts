@@ -67,6 +67,10 @@ export type Messages = {
   reqTimeToday: string;
   reqTimeTomorrow: string;
   reqTimeSoon: string;
+  /** Когда в админке заданы слоты — выбор даты/часа (Норвегия). */
+  reqVisitSlot: string;
+  reqVisitSlotPlaceholder: string;
+  reqTimezoneNote: string;
   reqTimeComment: string;
   reqTimeCommentPlaceholder: string;
   reqSubmit: string;
@@ -161,6 +165,9 @@ export const messages: Record<Locale, Messages> = {
     reqTimeToday: "I dag",
     reqTimeTomorrow: "I morgen",
     reqTimeSoon: "I løpet av de nærmeste dagene",
+    reqVisitSlot: "Ønsket tidspunkt for besøk",
+    reqVisitSlotPlaceholder: "Velg dato og klokkeslett",
+    reqTimezoneNote: "Tider vises i norsk tid (Europe/Oslo).",
     reqTimeComment: "Kommentar til tidspunkt (valgfritt)",
     reqTimeCommentPlaceholder: "F.eks. etter 18:00, før 12:00, helg…",
     reqSubmit: "Send bestilling",
@@ -255,6 +262,9 @@ export const messages: Record<Locale, Messages> = {
     reqTimeToday: "Сегодня",
     reqTimeTomorrow: "Завтра",
     reqTimeSoon: "В ближайшие дни",
+    reqVisitSlot: "Удобное время визита",
+    reqVisitSlotPlaceholder: "Выберите дату и время",
+    reqTimezoneNote: "Время указано по Норвегии (Europe/Oslo).",
     reqTimeComment: "Комментарий по времени (необязательно)",
     reqTimeCommentPlaceholder:
       "Например: после 18:00, до 12:00, выходные…",
@@ -350,6 +360,9 @@ export const messages: Record<Locale, Messages> = {
     reqTimeToday: "Today",
     reqTimeTomorrow: "Tomorrow",
     reqTimeSoon: "In the next few days",
+    reqVisitSlot: "Preferred visit time",
+    reqVisitSlotPlaceholder: "Pick date and time",
+    reqTimezoneNote: "Times are shown in Norway (Europe/Oslo).",
     reqTimeComment: "Time comment (optional)",
     reqTimeCommentPlaceholder: "E.g. after 6pm, before noon, weekend…",
     reqSubmit: "Send request",

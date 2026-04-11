@@ -57,9 +57,12 @@ function digitsOnly(s: string) {
   return s.replace(/\D/g, "");
 }
 
+type PublicSlot = { id: string; label: string };
+
 export function RepairRequestForm() {
   const { t, locale } = useLocale();
   const [files, setFiles] = useState<File[]>([]);
+  const [availSlots, setAvailSlots] = useState<PublicSlot[] | null>(null);
   const [submitState, setSubmitState] = useState<
     "idle" | "sending" | "error"
   >("idle");
@@ -67,36 +70,67 @@ export function RepairRequestForm() {
   const [successOpen, setSuccessOpen] = useState(false);
   const startedAtRef = useRef<number>(Date.now());
 
+  const useSlots = availSlots !== null && availSlots.length > 0;
+
   useEffect(() => {
     startedAtRef.current = Date.now();
   }, []);
 
+  useEffect(() => {
+    fetch(`/api/availability?locale=${encodeURIComponent(locale)}`)
+      .then((r) => r.json())
+      .then((j: { slots?: PublicSlot[] }) => {
+        setAvailSlots(Array.isArray(j.slots) ? j.slots : []);
+      })
+      .catch(() => setAvailSlots([]));
+  }, [locale]);
+
   const schema = useMemo(
     () =>
-      z.object({
-        name: z.string().trim().min(1, t.reqValidationRequired),
-        phone: z
-          .string()
-          .trim()
-          .min(1, t.reqValidationRequired)
-          .refine((v) => {
-            const d = digitsOnly(v);
-            return d.length === 10 && d.startsWith("47");
-          }, t.reqValidationPhone),
-        address: z.string().trim().optional(),
-        brand: z.string().trim().optional(),
-        brandOther: z.string().trim().optional(),
-        model: z.string().trim().optional(),
-        issue: z.string().trim().min(5, t.reqValidationRequired),
-        errorCode: z.string().trim().optional(),
-        time: z.enum(["today", "tomorrow", "soon"], {
-          message: t.reqValidationRequired,
+      z
+        .object({
+          name: z.string().trim().min(1, t.reqValidationRequired),
+          phone: z
+            .string()
+            .trim()
+            .min(1, t.reqValidationRequired)
+            .refine((v) => {
+              const d = digitsOnly(v);
+              return d.length === 10 && d.startsWith("47");
+            }, t.reqValidationPhone),
+          address: z.string().trim().optional(),
+          brand: z.string().trim().optional(),
+          brandOther: z.string().trim().optional(),
+          model: z.string().trim().optional(),
+          issue: z.string().trim().min(5, t.reqValidationRequired),
+          errorCode: z.string().trim().optional(),
+          time: z.enum(["today", "tomorrow", "soon"]).optional(),
+          slotKey: z.string().optional(),
+          timeComment: z.string().trim().optional(),
+          website: z.string().optional(),
+          startedAt: z.string().optional(),
+        })
+        .superRefine((data, ctx) => {
+          if (useSlots) {
+            if (!data.slotKey?.trim()) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: t.reqValidationRequired,
+                path: ["slotKey"],
+              });
+            }
+          } else {
+            const tm = data.time;
+            if (tm !== "today" && tm !== "tomorrow" && tm !== "soon") {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: t.reqValidationRequired,
+                path: ["time"],
+              });
+            }
+          }
         }),
-        timeComment: z.string().trim().optional(),
-        website: z.string().optional(),
-        startedAt: z.string().optional(),
-      }),
-    [t]
+    [t, useSlots]
   );
 
   type FormValues = z.infer<typeof schema>;
@@ -113,6 +147,7 @@ export function RepairRequestForm() {
       issue: "",
       errorCode: "",
       time: "soon",
+      slotKey: "",
       timeComment: "",
       website: "",
       startedAt: "",
@@ -176,7 +211,13 @@ export function RepairRequestForm() {
       fd.set("model", values.model?.trim() ?? "");
       fd.set("issue", values.issue.trim());
       fd.set("errorCode", values.errorCode?.trim() ?? "");
-      fd.set("time", values.time);
+      if (useSlots && values.slotKey?.trim()) {
+        fd.set("slotKey", values.slotKey.trim());
+        fd.set("time", "");
+      } else {
+        fd.set("slotKey", "");
+        fd.set("time", values.time ?? "soon");
+      }
       fd.set("timeComment", values.timeComment?.trim() ?? "");
       fd.set("startedAt", String(startedAtRef.current));
       for (const f of files) fd.append("media", f, f.name);
@@ -242,6 +283,7 @@ export function RepairRequestForm() {
 
         <CardContent>
           <form
+            key={availSlots === null ? "av-loading" : useSlots ? "av-slot" : "av-legacy"}
             onSubmit={form.handleSubmit(onSubmit)}
             className="grid gap-5"
             noValidate
@@ -388,28 +430,61 @@ export function RepairRequestForm() {
             </div>
 
             <div>
-              <Label>{t.reqTime} *</Label>
-              <Select
-                value={form.watch("time")}
-                onValueChange={(v) =>
-                  form.setValue("time", v as FormValues["time"], {
-                    shouldDirty: true,
-                  })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t.reqTimePlaceholder} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="today">{t.reqTimeToday}</SelectItem>
-                  <SelectItem value="tomorrow">{t.reqTimeTomorrow}</SelectItem>
-                  <SelectItem value="soon">{t.reqTimeSoon}</SelectItem>
-                </SelectContent>
-              </Select>
-              {form.formState.errors.time?.message && (
-                <p className="mt-1 text-xs text-amber-300">
-                  {form.formState.errors.time.message}
-                </p>
+              <Label>{useSlots ? `${t.reqVisitSlot} *` : `${t.reqTime} *`}</Label>
+              {availSlots === null ? (
+                <p className="mt-2 text-sm text-zinc-500">…</p>
+              ) : useSlots ? (
+                <>
+                  <Select
+                    value={form.watch("slotKey") || undefined}
+                    onValueChange={(v) =>
+                      form.setValue("slotKey", v, { shouldDirty: true, shouldValidate: true })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t.reqVisitSlotPlaceholder} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availSlots.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="mt-1.5 text-xs text-zinc-500">{t.reqTimezoneNote}</p>
+                  {form.formState.errors.slotKey?.message && (
+                    <p className="mt-1 text-xs text-amber-300">
+                      {form.formState.errors.slotKey.message}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Select
+                    value={form.watch("time")}
+                    onValueChange={(v) =>
+                      form.setValue("time", v as NonNullable<FormValues["time"]>, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t.reqTimePlaceholder} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="today">{t.reqTimeToday}</SelectItem>
+                      <SelectItem value="tomorrow">{t.reqTimeTomorrow}</SelectItem>
+                      <SelectItem value="soon">{t.reqTimeSoon}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {form.formState.errors.time?.message && (
+                    <p className="mt-1 text-xs text-amber-300">
+                      {form.formState.errors.time.message}
+                    </p>
+                  )}
+                </>
               )}
             </div>
           </div>

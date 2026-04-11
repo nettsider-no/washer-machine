@@ -40,3 +40,9 @@ create table if not exists public.tg_sessions (
 );
 
 create index if not exists tg_sessions_expires_idx on public.tg_sessions(expires_at);
+
+create table if not exists public.app_settings (
+  key text primary key,
+  value jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
