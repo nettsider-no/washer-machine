@@ -5,6 +5,7 @@ import {
   sendTelegramMessage,
 } from "@/lib/telegram";
 import { isLocale } from "@/lib/i18n";
+import { getClientIp } from "@/lib/requestSecurity";
 import { getDatabaseUrl } from "@/lib/db";
 import {
   insertOrder,
@@ -24,13 +25,6 @@ const WINDOW_MS = 10 * 60_000;
 const MAX_PER_WINDOW = 3;
 
 type RateState = { ts: number[]; last: number };
-
-function getIp(request: Request): string {
-  const xff = request.headers.get("x-forwarded-for");
-  if (xff) return xff.split(",")[0]?.trim() || "unknown";
-  const realIp = request.headers.get("x-real-ip");
-  return realIp?.trim() || "unknown";
-}
 
 function getRateMap(): Map<string, RateState> {
   const g = globalThis as unknown as {
@@ -57,7 +51,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
   }
 
-  const ip = getIp(request);
+  const ip = getClientIp(request);
   const now = Date.now();
   const rm = getRateMap();
   const st = rm.get(ip) ?? { ts: [], last: 0 };

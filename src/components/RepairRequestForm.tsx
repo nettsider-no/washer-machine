@@ -310,7 +310,7 @@ export function RepairRequestForm() {
         </DialogContent>
       </Dialog>
 
-      <Card className="mx-auto max-w-3xl">
+      <Card className="mx-auto max-w-3xl transition-[box-shadow,border-color] duration-300 hover:border-white/[0.14] hover:shadow-[0_0_48px_rgba(34,211,238,0.06)]">
         <CardHeader>
           <CardTitle>{t.requestFormTitle}</CardTitle>
           <CardDescription>{t.requestFormHint}</CardDescription>

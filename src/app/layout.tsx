@@ -46,7 +46,7 @@ export default async function RootLayout({
   return (
     <html
       lang={htmlLang}
-      className={`${display.variable} ${sans.variable} h-full antialiased`}
+      className={`${display.variable} ${sans.variable} h-full scroll-smooth antialiased`}
     >
       <body className="min-h-full font-[family-name:var(--font-sans-body)] text-zinc-100">
         <LocaleProvider initialLocale={initialLocale}>

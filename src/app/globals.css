@@ -11,6 +11,80 @@
   --font-sans: var(--font-sans-body);
 }
 
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes soft-pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 36px rgba(34, 211, 238, 0.32);
+  }
+  50% {
+    box-shadow: 0 0 48px rgba(34, 211, 238, 0.42);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -5px, 0);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fade-in-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    opacity: 0;
+  }
+
+  .animate-stagger-1 {
+    animation-delay: 70ms;
+  }
+
+  .animate-stagger-2 {
+    animation-delay: 140ms;
+  }
+
+  .animate-stagger-3 {
+    animation-delay: 210ms;
+  }
+
+  .animate-soft-pulse-glow {
+    animation: soft-pulse-glow 5s ease-in-out infinite;
+  }
+
+  .animate-float-slow {
+    animation: float-slow 10s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .animate-soft-pulse-glow {
+    animation: none;
+  }
+
+  .animate-float-slow {
+    animation: none;
+  }
+}
+
 body {
   background: linear-gradient(
     135deg,

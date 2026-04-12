@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import {
+  createIpWindowLimiter,
+  getClientIp,
+  isOriginAllowedForSite,
+} from "@/lib/requestSecurity";
+import {
   escapeHtml,
   sendTelegramHtml,
 } from "@/lib/telegram";
+
+const contactLimit = createIpWindowLimiter(10 * 60_000, 20);
 
 type Body = {
   name?: string;
@@ -14,6 +21,14 @@ type Body = {
 };
 
 export async function POST(request: Request) {
+  if (!isOriginAllowedForSite(request)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const ip = getClientIp(request);
+  if (!contactLimit(ip)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   let body: Body;
   try {
     body = await request.json();
