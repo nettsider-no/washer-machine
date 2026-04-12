@@ -34,6 +34,10 @@ yarn-error.log*
 .env*
 !.env.example
 
+# security scan reports (local)
+zap-report.html
+zap_out.json
+
 # vercel
 .vercel
 

@@ -13,7 +13,8 @@ function buildCsp(dev: boolean): string {
     "default-src 'self'",
     scriptSrc,
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https:",
+    /** Без `https:` — иначе ZAP считает img-src «wildcard»; внешних картинок в UI нет. */
+    "img-src 'self' data: blob:",
     "font-src 'self' data:",
     "connect-src 'self'",
     "frame-ancestors 'none'",
@@ -36,7 +37,13 @@ export function middleware(_request: NextRequest) {
     "camera=(), microphone=(), geolocation=()"
   );
   res.headers.set("Cross-Origin-Opener-Policy", "same-origin");
-  res.headers.set("Cross-Origin-Resource-Policy", "same-site");
+  /** same-origin строже same-site; ZAP рекомендует для документов. */
+  res.headers.set("Cross-Origin-Resource-Policy", "same-origin");
+  /**
+   * COEP без require-corp: не ломает обычные встраивания; закрывает алерт «header missing».
+   * Для полной crossOrigin isolation нужен отдельный проектный аудит.
+   */
+  res.headers.set("Cross-Origin-Embedder-Policy", "credentialless");
 
   if (!dev) {
     res.headers.set(
@@ -52,6 +59,10 @@ export function middleware(_request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    /**
+     * Включая /_next/static (чанки, шрифты) — иначе заголовки не попадают на ассеты (ZAP: CORP, Permissions-Policy, nosniff).
+     * Исключаем _next/image (оптимизация), favicon и типичные файлы из public по расширению.
+     */
+    "/((?!_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

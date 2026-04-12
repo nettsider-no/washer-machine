@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /** Security headers: см. src/middleware.ts (CSP, HSTS, COOP, CORP). */
+  /** Не светить стек в заголовке ответа (ZAP: Server Leaks Information via X-Powered-By). */
+  poweredByHeader: false,
 };
 
 export default nextConfig;
