@@ -8,17 +8,9 @@ import {
   escapeHtml,
   sendTelegramHtml,
 } from "@/lib/telegram";
+import { contactBodySchema } from "@/lib/validation/contact";
 
 const contactLimit = createIpWindowLimiter(10 * 60_000, 20);
-
-type Body = {
-  name?: string;
-  phone?: string;
-  email?: string;
-  city?: string;
-  message?: string;
-  website?: string;
-};
 
 export async function POST(request: Request) {
   if (!isOriginAllowedForSite(request)) {
@@ -29,36 +21,36 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
-  let body: Body;
+  let raw: unknown;
   try {
-    body = await request.json();
+    raw = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  if (body.website) {
+  const parsed = contactBodySchema.safeParse(raw);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid fields" }, { status: 400 });
+  }
+
+  const body = parsed.data;
+
+  if (body.website?.trim()) {
     return NextResponse.json({ ok: true });
   }
 
-  const name = (body.name ?? "").trim();
-  const phone = (body.phone ?? "").trim();
-  const email = (body.email ?? "").trim();
-  const city = (body.city ?? "").trim();
-  const message = (body.message ?? "").trim();
-
-  if (!name || !phone || !message) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-  }
+  const name = body.name.trim();
+  const phone = body.phone.trim();
+  const email = body.email?.trim() ?? "";
+  const city = body.city?.trim() ?? "";
+  const message = body.message.trim();
 
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
   if (!token || !chatId) {
     if (process.env.NODE_ENV === "development") {
-      console.info(
-        "[api/contact] Telegram not configured — dev mock OK. Payload:",
-        { name, phone, email: email || undefined, city: city || undefined, message }
-      );
+      console.info("[api/contact] Telegram not configured — dev mock OK.");
       return NextResponse.json({ ok: true, devMock: true });
     }
     return NextResponse.json(
@@ -85,10 +77,10 @@ export async function POST(request: Request) {
 
   if (!result.ok) {
     const desc = result.json.description ?? "";
-    console.error("Telegram API error:", result.json);
+    console.error("[api/contact] Telegram API error:", result.json?.ok === false ? "request failed" : "unknown");
     if (desc.toLowerCase().includes("chat not found")) {
       console.error(
-        "[api/contact] Fix TELEGRAM_CHAT_ID in Vercel: open a private chat with your bot and press /start, then call getUpdates and use message.chat.id (digits only, no quotes). For groups, add the bot, send a message, use that chat id (often negative)."
+        "[api/contact] Fix TELEGRAM_CHAT_ID: open a private chat with your bot and press /start."
       );
     }
     return NextResponse.json({ error: "Failed to notify" }, { status: 502 });

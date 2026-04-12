@@ -209,6 +209,11 @@ export function AdminPanel() {
         body: JSON.stringify({ password }),
       });
       if (!r.ok) {
+        const j = (await r.json().catch(() => null)) as { error?: string } | null;
+        if (r.status === 429 || j?.error === "rate_limited") {
+          setLoginError("Слишком много попыток. Подождите несколько минут.");
+          return;
+        }
         setLoginError("Неверный пароль");
         return;
       }

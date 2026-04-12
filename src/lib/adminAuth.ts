@@ -3,11 +3,20 @@ import { normalizeSecret } from "@/lib/telegram";
 
 const COOKIE_NAME = "wm_admin";
 
+function isProductionDeploy(): boolean {
+  return process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+}
+
+/**
+ * В продакшене подпись сессии только от ADMIN_SESSION_SECRET — не от пароля.
+ * Иначе утечка пароля из env = полная подделка cookie.
+ */
 function sessionSecret(): string | undefined {
-  const s = normalizeSecret(process.env.ADMIN_SESSION_SECRET);
-  if (s) return s;
+  const dedicated = normalizeSecret(process.env.ADMIN_SESSION_SECRET);
+  if (dedicated) return dedicated;
+  if (isProductionDeploy()) return undefined;
   const p = normalizeSecret(process.env.ADMIN_PASSWORD);
-  return p ? `wm:${p}` : undefined;
+  return p ? `wm:dev:${p}` : undefined;
 }
 
 export function getAdminCookieName(): string {

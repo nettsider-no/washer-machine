@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useLocale } from "./LocaleProvider";
+import { contactBodySchema } from "@/lib/validation/contact";
 
 export function ContactForm() {
   const { t } = useLocale();
@@ -17,7 +18,15 @@ export function ContactForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !phone.trim() || !message.trim()) {
+    const parsed = contactBodySchema.safeParse({
+      name,
+      phone,
+      email: email.trim() || undefined,
+      city: city.trim() || undefined,
+      message,
+      website: website || undefined,
+    });
+    if (!parsed.success) {
       setStatus("validate");
       return;
     }
@@ -27,12 +36,12 @@ export function ContactForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: name.trim(),
-          phone: phone.trim(),
-          email: email.trim(),
-          city: city.trim(),
-          message: message.trim(),
-          website,
+          name: parsed.data.name,
+          phone: parsed.data.phone,
+          email: parsed.data.email ?? "",
+          city: parsed.data.city ?? "",
+          message: parsed.data.message,
+          website: parsed.data.website ?? "",
         }),
       });
       if (!res.ok) {

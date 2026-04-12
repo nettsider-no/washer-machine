@@ -264,11 +264,7 @@ export function RepairRequestForm() {
           setSubmitState("error");
           return;
         }
-        const extra =
-          json.detail || json.code
-            ? ` (${[json.code, json.detail].filter(Boolean).join(": ")})`
-            : "";
-        setServerError((json.error || t.reqError) + extra);
+        setServerError(json.error || t.reqError);
         setSubmitState("error");
         return;
       }

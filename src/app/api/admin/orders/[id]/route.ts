@@ -3,11 +3,10 @@ import { readAdminCookie } from "@/lib/adminAuth";
 import { getVisitSlotsFromDb, setVisitSlotsInDb } from "@/lib/appSettingsRepo";
 import { loadOrderById, patchOrder } from "@/lib/orderRepo";
 import { parseSlotId, visitFieldsToSlotKey } from "@/lib/slotUtils";
+import { adminOrderPatchBodySchema } from "@/lib/validation/adminOrder";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-type Body = { action?: string };
 
 export async function PATCH(
   request: Request,
@@ -25,17 +24,19 @@ export async function PATCH(
     return NextResponse.json({ ok: false, error: "invalid_id" }, { status: 400 });
   }
 
-  let body: Body;
+  let raw: unknown;
   try {
-    body = (await request.json()) as Body;
+    raw = await request.json();
   } catch {
     return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
 
-  const action = body.action?.trim();
-  if (action !== "cancel" && action !== "cancel_and_hide_slot") {
+  const parsed = adminOrderPatchBodySchema.safeParse(raw);
+  if (!parsed.success) {
     return NextResponse.json({ ok: false, error: "unknown_action" }, { status: 400 });
   }
+
+  const action = parsed.data.action;
 
   try {
     const order = await loadOrderById(id);

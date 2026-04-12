@@ -5,20 +5,19 @@ import {
   sendTelegramMessage,
 } from "@/lib/telegram";
 import { isLocale } from "@/lib/i18n";
-import { getClientIp } from "@/lib/requestSecurity";
+import { getClientIp, isOriginAllowedForSite } from "@/lib/requestSecurity";
 import { getDatabaseUrl } from "@/lib/db";
-import {
-  insertOrder,
-  updateOrderTelegramMeta,
-} from "@/lib/orderRepo";
+import { insertOrder, updateOrderTelegramMeta } from "@/lib/orderRepo";
 import { formatOrderHtml, orderKeyboard, type OrderStatus } from "@/lib/orders";
 import { isSlotBookable } from "@/lib/publicAvailability";
 import { parseSlotId } from "@/lib/slotUtils";
+import { repairRequestFieldsSchema } from "@/lib/validation/repairRequest";
+import { fileMatchesClaimedImageOrVideo } from "@/lib/fileSniff";
 
 export const runtime = "nodejs";
 
 const MAX_FILES = 3;
-const MAX_FILE_BYTES = 25 * 1024 * 1024; // keep within typical Telegram limits
+const MAX_FILE_BYTES = 25 * 1024 * 1024;
 const MIN_HUMAN_MS = 2500;
 const MIN_GAP_MS = 20_000;
 const WINDOW_MS = 10 * 60_000;
@@ -40,15 +39,9 @@ function asString(v: FormDataEntryValue | null): string {
   return "";
 }
 
-function digitsOnly(s: string) {
-  return s.replace(/\D/g, "");
-}
-
 export async function POST(request: Request) {
-  const origin = request.headers.get("origin");
-  const host = request.headers.get("host");
-  if (origin && host && !origin.includes(host)) {
-    return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+  if (!isOriginAllowedForSite(request)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const ip = getClientIp(request);
@@ -81,30 +74,29 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Too fast" }, { status: 429 });
   }
 
-  const localeRaw = asString(fd.get("locale")).trim();
-  const locale = isLocale(localeRaw) ? localeRaw : "no";
+  const parsed = repairRequestFieldsSchema.safeParse({
+    website: asString(fd.get("website")),
+    startedAt: asString(fd.get("startedAt")),
+    locale: asString(fd.get("locale")),
+    name: asString(fd.get("name")),
+    phone: asString(fd.get("phone")),
+    address: asString(fd.get("address")),
+    brand: asString(fd.get("brand")),
+    brandOther: asString(fd.get("brandOther")),
+    model: asString(fd.get("model")),
+    issue: asString(fd.get("issue")),
+    errorCode: asString(fd.get("errorCode")),
+    time: asString(fd.get("time")) || undefined,
+    slotKey: asString(fd.get("slotKey")) || undefined,
+  });
 
-  const name = asString(fd.get("name")).trim();
-  const phone = asString(fd.get("phone")).trim();
-  const address = asString(fd.get("address")).trim();
-  const brand = asString(fd.get("brand")).trim();
-  const brandOther = asString(fd.get("brandOther")).trim();
-  const model = asString(fd.get("model")).trim();
-  const issue = asString(fd.get("issue")).trim();
-  const errorCode = asString(fd.get("errorCode")).trim();
-  const time = asString(fd.get("time")).trim();
-  const slotKey = asString(fd.get("slotKey")).trim();
-
-  if (!name || !phone || !issue) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-  }
-  const digits = digitsOnly(phone);
-  if (digits.length !== 10 || !digits.startsWith("47")) {
-    return NextResponse.json({ error: "Invalid phone" }, { status: 400 });
-  }
-  if (name.length < 2 || issue.length < 5) {
+  if (!parsed.success) {
     return NextResponse.json({ error: "Invalid fields" }, { status: 400 });
   }
+
+  const fields = parsed.data;
+  const localeRaw = (fields.locale ?? "").trim();
+  const locale = isLocale(localeRaw) ? localeRaw : "no";
 
   const mediaEntries = fd.getAll("media");
   const files = mediaEntries.filter((v): v is File => v instanceof File);
@@ -117,8 +109,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "File is too large" }, { status: 400 });
     }
     const type = (f.type || "").toLowerCase();
-    const ok = type.startsWith("image/") || type.startsWith("video/");
-    if (!ok) {
+    const mimeOk = type.startsWith("image/") || type.startsWith("video/");
+    if (!mimeOk) {
+      return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
+    }
+    const sniffOk = await fileMatchesClaimedImageOrVideo(f);
+    if (!sniffOk) {
       return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
     }
   }
@@ -130,6 +126,8 @@ export async function POST(request: Request) {
     let visitDate: string | null = null;
     let visitTime: string | null = null;
 
+    const slotKey = fields.slotKey?.trim() ?? "";
+
     if (slotKey) {
       const bookable = await isSlotBookable(slotKey);
       if (!bookable) {
@@ -138,13 +136,14 @@ export async function POST(request: Request) {
           { status: 409 }
         );
       }
-      const parsed = parseSlotId(slotKey);
-      if (!parsed) {
+      const parsedSlot = parseSlotId(slotKey);
+      if (!parsedSlot) {
         return NextResponse.json({ error: "Invalid time slot" }, { status: 400 });
       }
-      visitDate = parsed.d;
-      visitTime = `${String(parsed.h).padStart(2, "0")}:00`;
+      visitDate = parsedSlot.d;
+      visitTime = `${String(parsedSlot.h).padStart(2, "0")}:00`;
     } else {
+      const time = fields.time;
       preferredWindow =
         time === "today" || time === "tomorrow" || time === "soon" ? time : null;
       if (!preferredWindow) {
@@ -152,21 +151,24 @@ export async function POST(request: Request) {
       }
     }
 
+    const brand = fields.brand?.trim() ?? "";
+    const brandOther = fields.brandOther?.trim() ?? "";
+
     inserted = await insertOrder({
       status: "new" as OrderStatus,
       locale,
-      name,
-      phone,
-      address: address || null,
+      name: fields.name.trim(),
+      phone: fields.phone.trim(),
+      address: fields.address?.trim() ? fields.address.trim() : null,
       brand:
         brand === "other"
           ? brandOther || null
           : brand === "unknown"
             ? "Не знаю"
             : brand || null,
-      model: model || null,
-      issue,
-      error_code: errorCode || null,
+      model: fields.model?.trim() ? fields.model.trim() : null,
+      issue: fields.issue.trim(),
+      error_code: fields.errorCode?.trim() ? fields.errorCode.trim() : null,
       preferred_window: preferredWindow,
       preferred_comment: null,
       visit_date: visitDate,
@@ -180,18 +182,17 @@ export async function POST(request: Request) {
         { status: 409 }
       );
     }
-    const msg = e instanceof Error ? e.message : String(e);
     console.error("[api/repair-request] db error", e);
-    if (msg.includes("Missing DATABASE_URL")) {
+    if (
+      e instanceof Error &&
+      e.message.includes("Missing DATABASE_URL")
+    ) {
       return NextResponse.json(
         { error: "Database is not configured (missing DATABASE_URL)." },
         { status: 503 }
       );
     }
-    return NextResponse.json(
-      { error: "Storage error", detail: msg },
-      { status: 502 }
-    );
+    return NextResponse.json({ error: "Storage error" }, { status: 502 });
   }
 
   const { chatId } = getTelegramEnv();
@@ -200,7 +201,10 @@ export async function POST(request: Request) {
       console.info("[api/repair-request] Telegram not configured — dev mock OK.");
       return NextResponse.json({ ok: true, devMock: true });
     }
-    return NextResponse.json({ error: "Server is not configured for Telegram." }, { status: 503 });
+    return NextResponse.json(
+      { error: "Server is not configured for Telegram." },
+      { status: 503 }
+    );
   }
 
   const cardText = formatOrderHtml(inserted);
@@ -231,7 +235,7 @@ export async function POST(request: Request) {
     }));
     const mediaRes = await sendTelegramMediaGroup({ media });
     if (!mediaRes.ok) {
-      console.error("Telegram media error:", mediaRes.json);
+      console.error("[api/repair-request] Telegram media error", mediaRes.json);
     }
   }
 

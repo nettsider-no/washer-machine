@@ -18,9 +18,13 @@ import {
   normalizeSecret,
   sendTelegramMessage,
 } from "@/lib/telegram";
+import { createIpWindowLimiter, getClientIp } from "@/lib/requestSecurity";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+/** Защита от флуда телеграм-вебхука (аномальный трафик / DoS). */
+const webhookBurstLimit = createIpWindowLimiter(60_000, 200);
 
 type TgUpdate = {
   update_id: number;
@@ -75,12 +79,17 @@ async function refreshCard(o: OrderRow, messageRef?: CardMessageRef) {
   if (!res.ok) {
     const desc = String(res.json?.description ?? "");
     if (!desc.toLowerCase().includes("message is not modified")) {
-      console.error("[api/telegram] editMessageText failed", res.json);
+      console.error("[api/telegram] editMessageText failed");
     }
   }
 }
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  if (!webhookBurstLimit(ip)) {
+    return NextResponse.json({ ok: true });
+  }
+
   let update: TgUpdate;
   try {
     update = (await request.json()) as TgUpdate;
