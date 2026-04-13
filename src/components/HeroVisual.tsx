@@ -4,7 +4,8 @@ export function HeroVisual() {
       className="relative h-[280px] w-full max-w-lg sm:h-[360px]"
       aria-hidden
     >
-      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-fuchsia-600/20 via-cyan-500/15 to-yellow-400/10 blur-2xl" />
+      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[color:var(--hero-glow-fuchsia)] via-[color:var(--hero-glow-cyan)] to-[color:var(--hero-glow-amber)] blur-2xl" />
+      <div className="absolute inset-0 rounded-3xl border border-[var(--border)] bg-[color:var(--surface-strong)] shadow-[0_28px_90px_rgba(15,23,42,0.18)] backdrop-blur-sm" />
       <div className="animate-soft-pulse-glow absolute left-1/2 top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-cyan-400/60 bg-gradient-to-br from-cyan-500/30 to-transparent" />
       <div className="animate-float-slow absolute left-[18%] top-[22%]">
         <div className="h-14 w-14 rotate-12 rounded-lg border border-fuchsia-400/50 bg-fuchsia-500/20 shadow-[0_0_24px_rgba(217,70,239,0.35)]" />
