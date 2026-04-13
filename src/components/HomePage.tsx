@@ -21,7 +21,7 @@ export function HomePage() {
           <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:items-center lg:gap-8">
             <div className="flex flex-col gap-6">
               <h1 className="animate-fade-in-up font-[family-name:var(--font-display)] text-3xl font-bold leading-tight tracking-tight text-[var(--foreground)] sm:text-4xl md:text-5xl lg:text-[2.75rem] xl:text-6xl">
-                <span className="bg-gradient-to-r from-cyan-300 via-white to-fuchsia-300 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[color:var(--hero-from)] via-[color:var(--hero-via)] to-[color:var(--hero-to)] bg-clip-text text-transparent">
                   {t.heroTitle}
                 </span>
               </h1>

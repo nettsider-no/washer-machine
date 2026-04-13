@@ -20,6 +20,9 @@
   --accent-amber: rgb(180, 83, 9);
   --accent-amber-bg: rgba(245, 158, 11, 0.12);
   --accent-amber-border: rgba(180, 83, 9, 0.24);
+  --hero-from: rgb(8, 145, 178);
+  --hero-via: rgb(15, 23, 42);
+  --hero-to: rgb(162, 28, 175);
 
   --page-gradient: radial-gradient(
       1200px circle at 18% 12%,
@@ -59,6 +62,9 @@ html[data-theme="dark"] {
   --accent-amber: rgb(253, 230, 138);
   --accent-amber-bg: rgba(245, 158, 11, 0.12);
   --accent-amber-border: rgba(245, 158, 11, 0.26);
+  --hero-from: rgb(165, 243, 252);
+  --hero-via: rgb(255, 255, 255);
+  --hero-to: rgb(245, 208, 254);
 
   --page-gradient: linear-gradient(135deg, #1a0b2e 0%, #0d1f2d 45%, #0a1628 100%);
 }
@@ -83,6 +89,9 @@ html[data-theme="dark"] {
     --accent-amber: rgb(253, 230, 138);
     --accent-amber-bg: rgba(245, 158, 11, 0.12);
     --accent-amber-border: rgba(245, 158, 11, 0.26);
+    --hero-from: rgb(165, 243, 252);
+    --hero-via: rgb(255, 255, 255);
+    --hero-to: rgb(245, 208, 254);
 
     --page-gradient: linear-gradient(
       135deg,
