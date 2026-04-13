@@ -16,6 +16,6 @@ function secureFromRequest(request: Request): boolean {
 
 export async function POST(request: Request) {
   const secure = process.env.NODE_ENV === "production" || secureFromRequest(request);
-  const cookie = `${getAdminCookieName()}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure ? "; Secure" : ""}`;
+  const cookie = `${getAdminCookieName()}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0; Priority=High${secure ? "; Secure" : ""}`;
   return NextResponse.json({ ok: true }, { headers: { "Set-Cookie": cookie } });
 }
