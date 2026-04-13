@@ -11,9 +11,9 @@ export function HeroVisual() {
       </div>
       <div className="absolute right-[15%] top-[28%] h-10 w-10 -rotate-6 rounded-full border border-yellow-300/50 bg-yellow-400/15 shadow-[0_0_20px_rgba(250,204,21,0.3)]" />
       <div className="absolute bottom-[20%] left-[12%] h-12 w-12 rounded-full border border-cyan-300/40 bg-cyan-400/10" />
-      <div className="absolute bottom-[18%] right-[20%] h-16 w-16 rotate-45 rounded-xl border border-white/20 bg-white/5 backdrop-blur-sm" />
-      <div className="absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10" />
-      <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/10" />
+      <div className="absolute bottom-[18%] right-[20%] h-16 w-16 rotate-45 rounded-xl border border-[var(--border)] bg-[color:var(--surface)] backdrop-blur-sm" />
+      <div className="absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[var(--border)]" />
+      <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-[color:var(--border)]" />
     </div>
   );
 }

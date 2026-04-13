@@ -306,7 +306,7 @@ export function RepairRequestForm() {
         </DialogContent>
       </Dialog>
 
-      <Card className="mx-auto max-w-3xl transition-[box-shadow,border-color] duration-300 hover:border-white/[0.14] hover:shadow-[0_0_48px_rgba(34,211,238,0.06)]">
+      <Card className="mx-auto max-w-3xl transition-[box-shadow,border-color] duration-300 hover:border-cyan-500/25 hover:shadow-[0_0_48px_rgba(34,211,238,0.06)]">
         <CardHeader>
           <CardTitle>{t.requestFormTitle}</CardTitle>
           <CardDescription>{t.requestFormHint}</CardDescription>
@@ -363,7 +363,7 @@ export function RepairRequestForm() {
                 inputMode="tel"
                 autoComplete="tel"
                 className={cn(
-                  "flex h-11 w-full rounded-lg border border-white/15 bg-[#12081f]/80 px-3 py-2.5 text-zinc-100 outline-none ring-cyan-500/40 placeholder:text-zinc-600 focus:border-cyan-500/50 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60"
+                  "flex h-11 w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-cyan-500/40 placeholder:text-[color:var(--field-placeholder)] focus:border-cyan-500/50 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60"
                 )}
                 placeholder="+47 000 00 000"
                 value={form.watch("phone")}
@@ -427,7 +427,7 @@ export function RepairRequestForm() {
           <div>
             <div className="flex items-baseline justify-between gap-4">
               <Label htmlFor="rr-issue">{t.reqIssue} *</Label>
-              <span className="text-xs text-zinc-500">{t.reqIssueHintsLabel}</span>
+              <span className="text-xs text-[var(--muted)]">{t.reqIssueHintsLabel}</span>
             </div>
             <Textarea
               id="rr-issue"
@@ -441,7 +441,7 @@ export function RepairRequestForm() {
                   key={h}
                   type="button"
                   onClick={() => addHint(h)}
-                  className="rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs font-semibold text-zinc-200 transition hover:bg-white/5"
+                  className="rounded-full border border-[var(--border)] bg-[color:var(--surface)] px-3 py-1 text-xs font-semibold text-[var(--foreground)] transition hover:bg-[color:var(--surface-hover)]"
                 >
                   {h}
                 </button>
@@ -468,7 +468,7 @@ export function RepairRequestForm() {
             <div>
               <Label>{useSlots ? `${t.reqVisitSlot} *` : `${t.reqTime} *`}</Label>
               {availSlots === null ? (
-                <p className="mt-2 text-sm text-zinc-500">…</p>
+                <p className="mt-2 text-sm text-[var(--muted)]">…</p>
               ) : useSlots ? (
                 <>
                   <VisitSlotPicker
@@ -484,7 +484,7 @@ export function RepairRequestForm() {
                     pickDateLabel={t.reqSlotPickDate}
                     pickTimeLabel={t.reqSlotPickTime}
                   />
-                  <p className="mt-3 text-xs text-zinc-500">{t.reqTimezoneNote}</p>
+                  <p className="mt-3 text-xs text-[var(--muted)]">{t.reqTimezoneNote}</p>
                   {form.formState.errors.slotKey?.message && (
                     <p className="mt-1 text-xs text-amber-300">
                       {form.formState.errors.slotKey.message}
@@ -524,7 +524,7 @@ export function RepairRequestForm() {
           <div>
             <div className="flex items-baseline justify-between gap-4">
               <Label htmlFor="rr-media">{t.reqMedia}</Label>
-              <span className="text-xs text-zinc-500">{t.reqMediaHint}</span>
+              <span className="text-xs text-[var(--muted)]">{t.reqMediaHint}</span>
             </div>
 
             <div className="mt-2 grid gap-3">
@@ -532,11 +532,11 @@ export function RepairRequestForm() {
                 <label
                   htmlFor="rr-media"
                   className={cn(
-                    "inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/15 bg-black/30 px-4 py-2 text-sm font-semibold text-zinc-100 transition hover:bg-white/5",
+                    "inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[var(--foreground)] transition hover:bg-[color:var(--surface-hover)]",
                     !canSubmit && "pointer-events-none opacity-60"
                   )}
                 >
-                  <Paperclip className="h-4 w-4 text-zinc-300" />
+                  <Paperclip className="h-4 w-4 text-[var(--muted)]" />
                   <span>+ {t.reqMedia}</span>
                 </label>
                 <input
@@ -562,18 +562,18 @@ export function RepairRequestForm() {
                   {files.map((f, i) => (
                     <div
                       key={`${f.name}-${f.size}-${i}`}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/20 px-3 py-2"
+                      className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[color:var(--surface)] px-3 py-2"
                     >
                       <div className="min-w-0">
-                        <p className="truncate text-sm text-zinc-100">{f.name}</p>
-                        <p className="text-xs text-zinc-500">
+                        <p className="truncate text-sm text-[var(--foreground)]">{f.name}</p>
+                        <p className="text-xs text-[var(--muted)]">
                           {Math.round(f.size / 1024)} KB
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={() => removeFile(i)}
-                        className="rounded-lg p-2 text-zinc-400 transition hover:bg-white/5 hover:text-white"
+                        className="rounded-lg p-2 text-[var(--muted)] transition hover:bg-[color:var(--surface-hover)] hover:text-[var(--foreground)]"
                         aria-label="Remove file"
                       >
                         <X className="h-4 w-4" />
@@ -590,8 +590,8 @@ export function RepairRequestForm() {
           )}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="flex items-center gap-2 text-xs text-zinc-500">
-              <ShieldCheck className="h-4 w-4 text-cyan-200/80" />
+            <p className="flex items-center gap-2 text-xs text-[var(--muted)]">
+              <ShieldCheck className="h-4 w-4 text-[color:var(--accent-cyan)]" />
               <span>* {t.reqValidationRequired}</span>
             </p>
             <Button type="submit" disabled={!canSubmit}>

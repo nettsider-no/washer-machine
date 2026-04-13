@@ -29,11 +29,11 @@ export function ServiceIcon({ index }: { index: number }) {
 export function serviceIconAccent(index: number): string {
   switch (index % 4) {
     case 0:
-      return "text-cyan-400";
+      return "text-[color:var(--accent-cyan)]";
     case 1:
-      return "text-fuchsia-400";
+      return "text-[color:var(--accent-fuchsia)]";
     case 2:
-      return "text-amber-300";
+      return "text-[color:var(--accent-amber)]";
     default:
       return "text-emerald-400";
   }

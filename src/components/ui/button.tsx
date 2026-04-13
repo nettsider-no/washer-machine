@@ -14,8 +14,8 @@ const buttonVariants = cva(
         default:
           "bg-gradient-to-r from-cyan-600 to-fuchsia-600 text-white shadow-[0_0_28px_rgba(34,211,238,0.25)] hover:brightness-110",
         secondary:
-          "border border-white/15 bg-black/30 text-zinc-100 hover:bg-white/5",
-        ghost: "text-zinc-200 hover:bg-white/5",
+          "border border-[var(--border)] bg-[color:var(--surface)] text-[var(--foreground)] hover:bg-[color:var(--surface-hover)]",
+        ghost: "text-[var(--foreground)] hover:bg-[color:var(--surface-hover)]",
         destructive:
           "bg-red-600/90 text-white hover:bg-red-600 focus-visible:ring-red-500/40",
       },

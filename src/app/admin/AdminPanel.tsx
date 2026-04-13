@@ -278,7 +278,7 @@ export function AdminPanel() {
 
   if (authed === null || loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center text-zinc-400">
+      <div className="flex min-h-[50vh] items-center justify-center text-[var(--muted)]">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
@@ -287,11 +287,11 @@ export function AdminPanel() {
   if (!authed) {
     return (
       <div className="mx-auto max-w-md px-4 py-16">
-        <h1 className="mb-2 font-[family-name:var(--font-display)] text-xl font-bold text-white">
+        <h1 className="mb-2 font-[family-name:var(--font-display)] text-xl font-bold text-[var(--foreground)]">
           Панель: слоты выезда
         </h1>
-        <p className="mb-6 text-sm text-zinc-400">
-          Введите пароль из переменной <code className="text-cyan-300">ADMIN_PASSWORD</code> на
+        <p className="mb-6 text-sm text-[var(--muted)]">
+          Введите пароль из переменной <code className="text-[color:var(--accent-cyan)]">ADMIN_PASSWORD</code> на
           сервере.
         </p>
         <form onSubmit={login} className="grid gap-4">
@@ -319,20 +319,20 @@ export function AdminPanel() {
     <div className="mx-auto max-w-4xl px-4 py-10">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold text-white">
+          <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--foreground)]">
             Слоты на неделю вперёд
           </h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-[var(--muted)]">
             Часовой пояс: <b>Europe/Oslo</b> (Норвегия). Отметьте часы, когда можете принять выезд.
             На сайте клиенты увидят только эти окна.
           </p>
-          <p className="mt-2 max-w-xl text-sm text-zinc-500">
+          <p className="mt-2 max-w-xl text-sm text-[var(--muted)]">
             В любой момент можно <b>снять</b> галочку с часа или <b>добавить</b> новые — нажмите
             «Сохранить слоты». Изменения подхватываются на сайте в течение пары секунд (у
             открытой формы). Список броней подтягивается <b>сам каждые ~10 секунд</b> — обновлять
             страницу не нужно (кнопка «Обновить» — если нужно сразу).
           </p>
-          <p className="mt-2 max-w-xl text-sm text-zinc-500">
+          <p className="mt-2 max-w-xl text-sm text-[var(--muted)]">
             <b>Отмена в Telegram</b> («Отменить» на карточке) снимает бронь слота в базе: час снова
             доступен клиентам, если он отмечен в сетке ниже. Ниже — активные заявки: можно отменить
             из админки или отменить и сразу убрать час из публичного расписания.
@@ -348,32 +348,32 @@ export function AdminPanel() {
         </div>
       </div>
 
-      <div className="mx-auto mb-10 max-w-[720px] rounded-2xl border border-white/10 bg-black/25 p-4 backdrop-blur-sm">
-        <h2 className="mb-2 font-semibold text-white">Активные заявки</h2>
-        <p className="mb-4 text-sm text-zinc-500">
+      <div className="mx-auto mb-10 max-w-[720px] rounded-2xl border border-[var(--border)] bg-[color:var(--surface)] p-4 backdrop-blur-sm">
+        <h2 className="mb-2 font-semibold text-[var(--foreground)]">Активные заявки</h2>
+        <p className="mb-4 text-sm text-[var(--muted)]">
           Новые и в работе. После отмены слот освобождается для других клиентов.
         </p>
         {ordersLoading && orders.length === 0 ? (
-          <div className="flex justify-center py-6 text-zinc-500">
+          <div className="flex justify-center py-6 text-[var(--muted)]">
             <Loader2 className="h-6 w-6 animate-spin" />
           </div>
         ) : orders.length === 0 ? (
-          <p className="text-sm text-zinc-500">Нет активных заявок.</p>
+          <p className="text-sm text-[var(--muted)]">Нет активных заявок.</p>
         ) : (
           <ul className="flex flex-col gap-3">
             {orders.map((o) => (
               <li
                 key={o.id}
-                className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-zinc-200"
+                className="rounded-xl border border-[var(--border)] bg-[color:var(--surface)] px-3 py-2 text-sm text-[var(--foreground)]"
               >
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <span className="font-medium text-white">{o.name}</span>
-                    <span className="text-zinc-500"> · {o.phone}</span>
-                    <div className="mt-1 text-xs text-zinc-400">
+                    <span className="font-medium text-[var(--foreground)]">{o.name}</span>
+                    <span className="text-[var(--muted)]"> · {o.phone}</span>
+                    <div className="mt-1 text-xs text-[var(--muted)]">
                       {o.status === "new" ? "🆕 Новая" : "🔧 В работе"} · {orderSlotLabel(o)}
                     </div>
-                    <div className="font-mono text-[10px] text-zinc-600">{o.id}</div>
+                    <div className="font-mono text-[10px] text-[var(--muted)]">{o.id}</div>
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2 sm:mt-0">
                     <Button
@@ -394,7 +394,7 @@ export function AdminPanel() {
                         type="button"
                         variant="secondary"
                         size="sm"
-                        className="border border-amber-500/35 text-amber-100 hover:bg-amber-950/35"
+                        className="border border-[color:var(--accent-amber-border)] text-[color:var(--accent-amber)] hover:bg-[color:var(--surface-hover)]"
                         disabled={orderActionId === o.id}
                         onClick={() => void cancelOrder(o.id, "cancel_and_hide_slot")}
                       >
@@ -413,9 +413,9 @@ export function AdminPanel() {
         {dates.map((d) => (
           <div
             key={d}
-            className="rounded-2xl border border-white/10 bg-black/30 p-4 backdrop-blur-sm"
+            className="rounded-2xl border border-[var(--border)] bg-[color:var(--surface)] p-4 backdrop-blur-sm"
           >
-            <p className="mb-3 font-semibold capitalize text-cyan-200">{dayTitle(d)}</p>
+            <p className="mb-3 font-semibold capitalize text-[color:var(--accent-cyan)]">{dayTitle(d)}</p>
             <div className="flex flex-wrap gap-2">
               {hours.map((h) => {
                 const id = slotId(d, h);
@@ -435,12 +435,12 @@ export function AdminPanel() {
                       !on &&
                         isBooked &&
                         "border-amber-500/40 bg-amber-950/30 text-amber-100/90",
-                      !on && !isBooked && "border-white/10 bg-black/40 text-zinc-400 hover:border-white/20"
+                      !on && !isBooked && "border-[var(--border)] bg-[color:var(--surface)] text-[var(--muted)] hover:border-cyan-500/25"
                     )}
                   >
                     <span>{String(h).padStart(2, "0")}:00</span>
                     {isBooked && (
-                      <span className="mt-0.5 text-[9px] font-bold uppercase leading-none text-amber-200/95">
+                      <span className="mt-0.5 text-[9px] font-bold uppercase leading-none text-[color:var(--accent-amber)]">
                         Занято
                       </span>
                     )}
@@ -463,7 +463,7 @@ export function AdminPanel() {
             "Сохранить слоты"
           )}
         </Button>
-        {savedMsg && <span className="text-sm text-zinc-400">{savedMsg}</span>}
+        {savedMsg && <span className="text-sm text-[var(--muted)]">{savedMsg}</span>}
       </div>
     </div>
   );

@@ -67,7 +67,7 @@ export function VisitSlotPicker({
   return (
     <div className="grid gap-5">
       <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
           {pickDateLabel}
         </p>
         <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
@@ -93,19 +93,21 @@ export function VisitSlotPicker({
                 className={cn(
                   "flex min-h-[4.25rem] flex-col items-center justify-center rounded-xl border px-1 py-2 text-center transition",
                   !hasSlots &&
-                    "cursor-not-allowed border-white/5 bg-black/20 opacity-40",
+                    "cursor-not-allowed border-[var(--border)] bg-[color:var(--surface)] opacity-45",
                   hasSlots &&
                     !isPicked &&
-                    "border-white/15 bg-black/30 hover:border-cyan-500/40 hover:bg-white/5",
+                    "border-[var(--border)] bg-[color:var(--surface)] hover:border-cyan-500/40 hover:bg-[color:var(--surface-hover)]",
                   hasSlots &&
                     isPicked &&
                     "border-cyan-400/60 bg-cyan-500/15 shadow-[0_0_20px_rgba(34,211,238,0.12)]"
                 )}
               >
-                <span className="text-[10px] font-medium uppercase leading-tight text-zinc-500">
+                <span className="text-[10px] font-medium uppercase leading-tight text-[var(--muted)]">
                   {wk}
                 </span>
-                <span className="text-lg font-bold leading-tight text-zinc-100">{num}</span>
+                <span className="text-lg font-bold leading-tight text-[var(--foreground)]">
+                  {num}
+                </span>
               </button>
             );
           })}
@@ -114,7 +116,7 @@ export function VisitSlotPicker({
 
       {pickedDate && timesForDay.length > 0 && (
         <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
             {pickTimeLabel}
           </p>
           <div className="flex flex-wrap gap-2">
@@ -133,8 +135,8 @@ export function VisitSlotPicker({
                   className={cn(
                     "min-w-[4.5rem] rounded-lg border px-3 py-2 text-sm font-semibold transition",
                     active
-                      ? "border-cyan-400/60 bg-cyan-500/20 text-cyan-100"
-                      : "border-white/15 bg-black/40 text-zinc-200 hover:border-white/25"
+                      ? "border-cyan-400/60 bg-cyan-500/20 text-[color:var(--accent-cyan)]"
+                      : "border-[var(--border)] bg-[color:var(--surface)] text-[var(--foreground)] hover:border-[color:var(--border)]"
                   )}
                 >
                   {label}

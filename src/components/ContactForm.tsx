@@ -62,7 +62,7 @@ export function ContactForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="mx-auto grid max-w-xl gap-4 rounded-2xl border border-white/10 bg-black/25 p-6 shadow-[0_0_40px_rgba(0,0,0,0.35)] backdrop-blur-sm"
+      className="mx-auto grid max-w-xl gap-4 rounded-2xl border border-[var(--border)] bg-[color:var(--surface)] p-6 shadow-[0_0_40px_rgba(0,0,0,0.22)] backdrop-blur-sm"
     >
       <input
         type="text"
@@ -75,7 +75,7 @@ export function ContactForm() {
         aria-hidden
       />
       <div>
-        <label className="mb-1 block text-sm text-zinc-400" htmlFor="cf-name">
+        <label className="mb-1 block text-sm text-[var(--muted)]" htmlFor="cf-name">
           {t.formName} *
         </label>
         <input
@@ -83,11 +83,11 @@ export function ContactForm() {
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-lg border border-white/15 bg-[#12081f]/80 px-3 py-2.5 text-zinc-100 outline-none ring-cyan-500/40 placeholder:text-zinc-600 focus:border-cyan-500/50 focus:ring-2"
+          className="w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-cyan-500/40 placeholder:text-[color:var(--field-placeholder)] focus:border-cyan-500/50 focus:ring-2"
         />
       </div>
       <div>
-        <label className="mb-1 block text-sm text-zinc-400" htmlFor="cf-phone">
+        <label className="mb-1 block text-sm text-[var(--muted)]" htmlFor="cf-phone">
           {t.formPhone} *
         </label>
         <input
@@ -96,11 +96,11 @@ export function ContactForm() {
           required
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="w-full rounded-lg border border-white/15 bg-[#12081f]/80 px-3 py-2.5 text-zinc-100 outline-none ring-cyan-500/40 focus:border-cyan-500/50 focus:ring-2"
+          className="w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-cyan-500/40 focus:border-cyan-500/50 focus:ring-2"
         />
       </div>
       <div>
-        <label className="mb-1 block text-sm text-zinc-400" htmlFor="cf-email">
+        <label className="mb-1 block text-sm text-[var(--muted)]" htmlFor="cf-email">
           {t.formEmail}
         </label>
         <input
@@ -108,23 +108,23 @@ export function ContactForm() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-lg border border-white/15 bg-[#12081f]/80 px-3 py-2.5 text-zinc-100 outline-none ring-cyan-500/40 focus:border-cyan-500/50 focus:ring-2"
+          className="w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-cyan-500/40 focus:border-cyan-500/50 focus:ring-2"
         />
       </div>
       <div>
-        <label className="mb-1 block text-sm text-zinc-400" htmlFor="cf-city">
+        <label className="mb-1 block text-sm text-[var(--muted)]" htmlFor="cf-city">
           {t.formCity}
         </label>
         <input
           id="cf-city"
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          className="w-full rounded-lg border border-white/15 bg-[#12081f]/80 px-3 py-2.5 text-zinc-100 outline-none ring-cyan-500/40 focus:border-cyan-500/50 focus:ring-2"
+          className="w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-cyan-500/40 focus:border-cyan-500/50 focus:ring-2"
         />
       </div>
       <div>
         <label
-          className="mb-1 block text-sm text-zinc-400"
+          className="mb-1 block text-sm text-[var(--muted)]"
           htmlFor="cf-message"
         >
           {t.formMessage} *
@@ -135,7 +135,7 @@ export function ContactForm() {
           rows={4}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="w-full resize-y rounded-lg border border-white/15 bg-[#12081f]/80 px-3 py-2.5 text-zinc-100 outline-none ring-cyan-500/40 focus:border-cyan-500/50 focus:ring-2"
+          className="w-full resize-y rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-cyan-500/40 focus:border-cyan-500/50 focus:ring-2"
         />
       </div>
       {status === "validate" && (
