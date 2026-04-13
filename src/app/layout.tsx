@@ -42,13 +42,19 @@ export default async function RootLayout({
     hdrs.get("accept-language")
   );
   const htmlLang = initialLocale === "no" ? "no" : initialLocale;
+  const themeCookie = cookieStore.get("wash_theme")?.value;
+  const theme =
+    themeCookie === "light" || themeCookie === "dark" || themeCookie === "system"
+      ? themeCookie
+      : "system";
 
   return (
     <html
       lang={htmlLang}
+      data-theme={theme}
       className={`${display.variable} ${sans.variable} h-full scroll-smooth antialiased`}
     >
-      <body className="min-h-full font-[family-name:var(--font-sans-body)] text-zinc-100">
+      <body className="min-h-full font-[family-name:var(--font-sans-body)] text-[var(--foreground)]">
         <LocaleProvider initialLocale={initialLocale}>
           {children}
         </LocaleProvider>
