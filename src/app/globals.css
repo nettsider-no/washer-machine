@@ -26,6 +26,10 @@
   --hero-glow-fuchsia: rgba(217, 70, 239, 0.26);
   --hero-glow-cyan: rgba(34, 211, 238, 0.22);
   --hero-glow-amber: rgba(245, 158, 11, 0.14);
+  --hero-ink: rgba(15, 23, 42, 0.72);
+  --hero-line: rgba(15, 23, 42, 0.14);
+  --hero-fill: rgba(255, 255, 255, 0.82);
+  --hero-shadow: rgba(15, 23, 42, 0.16);
 
   --page-gradient: radial-gradient(
       1200px circle at 18% 12%,
@@ -71,6 +75,10 @@ html[data-theme="dark"] {
   --hero-glow-fuchsia: rgba(217, 70, 239, 0.2);
   --hero-glow-cyan: rgba(34, 211, 238, 0.16);
   --hero-glow-amber: rgba(245, 158, 11, 0.1);
+  --hero-ink: rgba(228, 228, 231, 0.78);
+  --hero-line: rgba(255, 255, 255, 0.12);
+  --hero-fill: rgba(0, 0, 0, 0.26);
+  --hero-shadow: rgba(0, 0, 0, 0.42);
 
   --page-gradient: linear-gradient(135deg, #1a0b2e 0%, #0d1f2d 45%, #0a1628 100%);
 }
@@ -101,6 +109,10 @@ html[data-theme="dark"] {
     --hero-glow-fuchsia: rgba(217, 70, 239, 0.2);
     --hero-glow-cyan: rgba(34, 211, 238, 0.16);
     --hero-glow-amber: rgba(245, 158, 11, 0.1);
+    --hero-ink: rgba(228, 228, 231, 0.78);
+    --hero-line: rgba(255, 255, 255, 0.12);
+    --hero-fill: rgba(0, 0, 0, 0.26);
+    --hero-shadow: rgba(0, 0, 0, 0.42);
 
     --page-gradient: linear-gradient(
       135deg,
