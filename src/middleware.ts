@@ -76,10 +76,11 @@ export function middleware(_request: NextRequest) {
   /** same-origin строже same-site; ZAP рекомендует для документов. */
   res.headers.set("Cross-Origin-Resource-Policy", "same-origin");
   /**
-   * COEP без require-corp: не ломает обычные встраивания; закрывает алерт «header missing».
-   * Для полной crossOrigin isolation нужен отдельный проектный аудит.
+   * COEP ломает встраивание некоторых 3rd-party iframe (включая Google Maps embed).
+   * Мы не используем crossOrigin isolation — поэтому оставляем COEP выключенным
+   * для совместимости с картой в секции "Зона обслуживания".
    */
-  res.headers.set("Cross-Origin-Embedder-Policy", "credentialless");
+  res.headers.delete("Cross-Origin-Embedder-Policy");
 
   if (!dev) {
     res.headers.set(
