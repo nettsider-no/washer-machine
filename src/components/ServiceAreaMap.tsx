@@ -39,9 +39,12 @@ export function ServiceAreaMap({
     )}&ll=${encodeURIComponent(ll)}&z=10&spn=0.6,0.6`;
     // Note: Apple Maps does not allow embedding in an iframe (it is blocked by browser security headers).
     // Use Google Maps embed in the page, and offer an Apple Maps deep-link on Apple devices.
-    const google = `https://www.google.com/maps?output=embed&q=${encodeURIComponent(
-      "Oslo, Norway"
-    )}&z=10`;
+    const google =
+      "https://www.google.com/maps/embed?pb=" +
+      "!1m18!1m12!1m3!1d72395.53356536664!2d10.65976055664062!3d59.91386879999999" +
+      "!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1" +
+      "!3m3!1m2!1s0x46416e61f267f03d%3A0x5fd9653d8f0c595!2sOslo%2C%20Norway" +
+      "!5e0!3m2!1sen!2sno!4v1";
     return { appleHref: apple, googleEmbedSrc: google };
   }, [center.lat, center.lng]);
 
