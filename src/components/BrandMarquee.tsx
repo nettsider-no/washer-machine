@@ -54,15 +54,17 @@ export function BrandMarquee({
     <section className={className} aria-label={label}>
       <div className="mx-auto max-w-6xl">
         <div className="wash-marquee relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[color:var(--surface)]">
-          <div className="wash-marquee__track" aria-hidden>
-            {BRANDS.map((b) => (
-              <BrandItem key={`a-${b}`} brand={b} />
-            ))}
-          </div>
-          <div className="wash-marquee__track" aria-hidden>
-            {BRANDS.map((b) => (
-              <BrandItem key={`b-${b}`} brand={b} />
-            ))}
+          <div className="wash-marquee__inner" aria-hidden>
+            <div className="wash-marquee__track">
+              {BRANDS.map((b) => (
+                <BrandItem key={`a-${b}`} brand={b} />
+              ))}
+            </div>
+            <div className="wash-marquee__track">
+              {BRANDS.map((b) => (
+                <BrandItem key={`b-${b}`} brand={b} />
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -7,7 +7,7 @@ export function HeroVisual() {
       {/* Premium surface */}
       <div className="absolute inset-0 rounded-3xl border border-[color:var(--hero-line)] bg-[color:var(--hero-fill)] shadow-[0_28px_90px_var(--hero-shadow)] backdrop-blur-sm" />
 
-      {/* Minimal line illustration: washer + water + gear */}
+      {/* Isometric 3D lineart: washing machine */}
       <svg
         className="absolute inset-0 h-full w-full"
         viewBox="0 0 520 360"
@@ -16,120 +16,112 @@ export function HeroVisual() {
         preserveAspectRatio="xMidYMid meet"
       >
         <defs>
-          <linearGradient id="wm_accent" x1="110" y1="70" x2="430" y2="300" gradientUnits="userSpaceOnUse">
-            <stop stopColor="var(--accent)" stopOpacity="0.22" />
-            <stop offset="0.6" stopColor="var(--accent)" stopOpacity="0.06" />
-            <stop offset="1" stopColor="var(--foreground)" stopOpacity="0.04" />
+          <linearGradient id="iso_face" x1="140" y1="90" x2="380" y2="300" gradientUnits="userSpaceOnUse">
+            <stop stopColor="var(--accent)" stopOpacity="0.16" />
+            <stop offset="1" stopColor="var(--foreground)" stopOpacity="0.02" />
           </linearGradient>
         </defs>
 
-        {/* Subtle grid line */}
-        <path
-          d="M64 82H456"
-          stroke="var(--hero-line)"
-          strokeWidth="1"
-          strokeLinecap="round"
-        />
+        {/* Outer frame */}
+        <rect x="64" y="44" width="392" height="272" rx="34" stroke="var(--hero-line)" strokeWidth="1.2" />
 
-        {/* Washer body */}
-        <rect
-          x="136"
-          y="80"
-          width="248"
-          height="240"
-          rx="28"
-          fill="url(#wm_accent)"
-          stroke="var(--hero-line)"
-          strokeWidth="1.5"
-        />
-
-        {/* Top controls */}
-        <rect
-          x="166"
-          y="108"
-          width="120"
-          height="18"
-          rx="9"
-          fill="transparent"
-          stroke="var(--hero-line)"
-          strokeWidth="1.2"
-        />
-        <circle cx="336" cy="117" r="7" stroke="var(--hero-line)" strokeWidth="1.2" />
-        <circle cx="360" cy="117" r="7" stroke="var(--hero-line)" strokeWidth="1.2" />
-
-        {/* Door */}
-        <circle
-          cx="260"
-          cy="208"
-          r="74"
-          fill="transparent"
-          stroke="var(--hero-ink)"
-          strokeOpacity="0.25"
-          strokeWidth="2"
-        />
-        <circle
-          cx="260"
-          cy="208"
-          r="56"
-          fill="transparent"
-          stroke="var(--hero-line)"
-          strokeWidth="1.4"
-        />
-
-        {/* Water waves inside door */}
-        <path
-          d="M218 214c14-12 32-12 46 0s32 12 46 0"
-          stroke="var(--accent)"
-          strokeOpacity="0.55"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        <path
-          d="M224 234c12-10 28-10 40 0s28 10 40 0"
-          stroke="var(--accent)"
-          strokeOpacity="0.35"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-
-        {/* Droplets */}
-        <path
-          d="M404 138c0 10-8 18-18 18s-18-8-18-18c0-14 18-28 18-28s18 14 18 28Z"
-          fill="transparent"
-          stroke="var(--accent)"
-          strokeOpacity="0.32"
-          strokeWidth="1.8"
-        />
-        <path
-          d="M118 246c0 8-6.5 14.5-14.5 14.5S89 254 89 246c0-11 14.5-23 14.5-23s14.5 12 14.5 23Z"
-          fill="transparent"
-          stroke="var(--accent)"
-          strokeOpacity="0.22"
-          strokeWidth="1.6"
-        />
-
-        {/* Small gear */}
-        <g transform="translate(410 246)">
-          <circle cx="0" cy="0" r="18" stroke="var(--hero-line)" strokeWidth="1.4" />
-          <circle cx="0" cy="0" r="6" stroke="var(--hero-line)" strokeWidth="1.4" />
+        {/* Isometric washer group */}
+        <g transform="translate(0 2)">
+          {/* Top face */}
           <path
-            d="M0-26v8M0 18v8M-26 0h8M18 0h8M-18-18l6 6M12 12l6 6M-18 18l6-6M12-12l6-6"
+            d="M200 92 L330 92 L388 126 L258 126 Z"
+            fill="transparent"
+            stroke="var(--hero-line)"
+            strokeWidth="1.3"
+            strokeLinejoin="round"
+          />
+
+          {/* Left face */}
+          <path
+            d="M200 92 L258 126 L258 292 L200 258 Z"
+            fill="transparent"
+            stroke="var(--hero-line)"
+            strokeWidth="1.3"
+            strokeLinejoin="round"
+          />
+
+          {/* Front face */}
+          <path
+            d="M258 126 L388 126 L388 292 L258 292 Z"
+            fill="url(#iso_face)"
+            stroke="var(--hero-line)"
+            strokeWidth="1.5"
+            strokeLinejoin="round"
+          />
+
+          {/* Control panel (front, top strip) */}
+          <path
+            d="M268 142 L378 142 L378 160 L268 160 Z"
+            fill="transparent"
+            stroke="var(--hero-line)"
+            strokeWidth="1.2"
+            strokeLinejoin="round"
+          />
+          <circle cx="362" cy="151" r="6.5" fill="transparent" stroke="var(--hero-line)" strokeWidth="1.2" />
+          <circle cx="340" cy="151" r="6.5" fill="transparent" stroke="var(--hero-line)" strokeWidth="1.2" />
+
+          {/* Door (isometric ellipse) */}
+          <ellipse
+            cx="323"
+            cy="224"
+            rx="58"
+            ry="52"
+            fill="transparent"
+            stroke="var(--hero-ink)"
+            strokeOpacity="0.22"
+            strokeWidth="2"
+          />
+          <ellipse
+            cx="323"
+            cy="224"
+            rx="42"
+            ry="38"
+            fill="transparent"
             stroke="var(--hero-line)"
             strokeWidth="1.4"
+          />
+
+          {/* Water waves */}
+          <path
+            d="M294 230c10-9 22-9 32 0s22 9 32 0"
+            stroke="var(--accent)"
+            strokeOpacity="0.5"
+            strokeWidth="2"
             strokeLinecap="round"
           />
-        </g>
+          <path
+            d="M300 246c9-8 19-8 28 0s19 8 28 0"
+            stroke="var(--accent)"
+            strokeOpacity="0.3"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
 
-        {/* Frame */}
-        <rect
-          x="64"
-          y="44"
-          width="392"
-          height="272"
-          rx="34"
-          stroke="var(--hero-line)"
-          strokeWidth="1.2"
-        />
+          {/* Accent edge highlight */}
+          <path
+            d="M258 126 L388 126"
+            stroke="var(--accent)"
+            strokeOpacity="0.22"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+
+          {/* Small floating tool/gear (minimal) */}
+          <g transform="translate(166 242)">
+            <circle cx="0" cy="0" r="16" fill="transparent" stroke="var(--hero-line)" strokeWidth="1.3" />
+            <path
+              d="M0-22v7M0 15v7M-22 0h7M15 0h7M-15-15l5 5M10 10l5 5M-15 15l5-5M10-10l5-5"
+              stroke="var(--hero-line)"
+              strokeWidth="1.3"
+              strokeLinecap="round"
+            />
+          </g>
+        </g>
       </svg>
     </div>
   );

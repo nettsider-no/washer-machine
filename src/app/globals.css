@@ -196,6 +196,8 @@ html[data-theme="dark"] {
 
 /* Marquee: brands we service */
 .wash-marquee {
+  display: flex;
+  align-items: center;
   mask-image: linear-gradient(
     to right,
     transparent 0%,
@@ -203,6 +205,11 @@ html[data-theme="dark"] {
     black 88%,
     transparent 100%
   );
+}
+
+.wash-marquee__inner {
+  display: flex;
+  width: max-content;
 }
 
 .wash-marquee__track {
