@@ -2,6 +2,7 @@
 
 import { useLocale, LOCALES, type Locale } from "./LocaleProvider";
 import { ThemeToggle } from "./ThemeToggle";
+import { LogoMark } from "./LogoMark";
 
 const labels: Record<Locale, string> = { no: "NO", ru: "RU", en: "EN" };
 
@@ -16,11 +17,7 @@ export function Header() {
           className="group flex items-center gap-2 font-[family-name:var(--font-display)] text-sm font-semibold tracking-tight text-[var(--foreground)] transition-colors duration-200 hover:text-[color:var(--accent-ink)] active:translate-y-px active:scale-[0.98] sm:text-base"
         >
           <span className="flex h-8 w-8 items-center justify-center rounded-xl border border-[var(--border)] bg-[color:var(--surface)]">
-            <img
-              src="/logo.svg"
-              alt="WM Service"
-              className="h-5 w-5 text-[color:var(--foreground)]"
-            />
+            <LogoMark className="h-5 w-5" />
           </span>
           <span>
             WM
