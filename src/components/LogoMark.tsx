@@ -7,54 +7,51 @@ export function LogoMark({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
     >
+      {/* Outer squircle */}
       <rect
-        x="6"
-        y="4.5"
-        width="20"
-        height="23"
-        rx="6"
+        x="5.5"
+        y="5.5"
+        width="21"
+        height="21"
+        rx="7"
         stroke="var(--hero-line)"
-        strokeWidth="1.5"
+        strokeWidth="1.4"
       />
-      <path
-        d="M9 10H23"
-        stroke="var(--hero-line)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <circle cx="22.2" cy="7.6" r="1.2" fill="var(--hero-line)" />
-      <circle cx="18.9" cy="7.6" r="1.2" fill="var(--hero-line)" />
 
+      {/* Dial ring */}
       <circle
         cx="16"
-        cy="18"
-        r="6.6"
+        cy="16.2"
+        r="7.1"
         stroke="var(--hero-line)"
-        strokeWidth="1.5"
+        strokeWidth="1.4"
       />
+      <circle
+        cx="16"
+        cy="16.2"
+        r="4.6"
+        stroke="var(--hero-line)"
+        strokeOpacity="0.65"
+        strokeWidth="1.2"
+      />
+
+      {/* Accent arc (service signal) */}
       <path
-        d="M12.6 19c1.4-1.7 3.6-2.2 5.3-1.2 1.7 1 3.1.8 4.1-.4"
+        d="M12.2 18.4c1.2-1.6 3.4-2.2 5.2-1.2 1.9 1 3.4.8 4.4-.4"
         stroke="var(--accent)"
-        strokeOpacity="0.6"
-        strokeWidth="1.6"
+        strokeOpacity="0.7"
+        strokeWidth="1.7"
         strokeLinecap="round"
       />
 
-      {/* Wrench hint */}
+      {/* Small notch + dot */}
       <path
-        d="M10.8 24.6l10.5-10.5"
-        stroke="var(--accent)"
-        strokeOpacity="0.75"
-        strokeWidth="1.8"
+        d="M16 7.9v2.1"
+        stroke="var(--hero-line)"
+        strokeWidth="1.4"
         strokeLinecap="round"
       />
-      <path
-        d="M21.4 13.8l2-2"
-        stroke="var(--accent)"
-        strokeOpacity="0.75"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
+      <circle cx="22.9" cy="10.7" r="1.1" fill="var(--accent)" fillOpacity="0.75" />
     </svg>
   );
 }
