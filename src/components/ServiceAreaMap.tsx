@@ -32,18 +32,18 @@ export function ServiceAreaMap({
     setUseApple(isApplePlatform());
   }, []);
 
-  const { appleSrc, googleSrc } = useMemo(() => {
+  const { appleHref, googleEmbedSrc } = useMemo(() => {
     const ll = `${center.lat},${center.lng}`;
     const apple = `https://maps.apple.com/?q=${encodeURIComponent(
       "Oslo"
     )}&ll=${encodeURIComponent(ll)}&z=10&spn=0.6,0.6`;
+    // Note: Apple Maps does not allow embedding in an iframe (it is blocked by browser security headers).
+    // Use Google Maps embed in the page, and offer an Apple Maps deep-link on Apple devices.
     const google = `https://www.google.com/maps?output=embed&q=${encodeURIComponent(
       "Oslo, Norway"
     )}&z=10`;
-    return { appleSrc: apple, googleSrc: google };
+    return { appleHref: apple, googleEmbedSrc: google };
   }, [center.lat, center.lng]);
-
-  const src = useApple ? appleSrc : googleSrc;
 
   return (
     <figure className={className}>
@@ -55,15 +55,26 @@ export function ServiceAreaMap({
             </p>
             <p className="mt-1 text-sm text-[var(--muted)]">{caption}</p>
           </div>
-          <span className="hidden shrink-0 rounded-full border border-[var(--border)] bg-[color:var(--surface-strong)] px-3 py-1 text-xs font-semibold text-[var(--foreground)] sm:inline">
-            {useApple ? "Apple Maps" : "Google Maps"}
-          </span>
+          {useApple ? (
+            <a
+              href={appleHref}
+              target="_blank"
+              rel="noreferrer"
+              className="hidden shrink-0 rounded-full border border-[color:var(--accent-border)] bg-[color:var(--accent-bg)] px-3 py-1 text-xs font-semibold text-[color:var(--accent-ink)] transition hover:brightness-[1.02] sm:inline"
+            >
+              Open in Apple Maps
+            </a>
+          ) : (
+            <span className="hidden shrink-0 rounded-full border border-[var(--border)] bg-[color:var(--surface-strong)] px-3 py-1 text-xs font-semibold text-[var(--foreground)] sm:inline">
+              Google Maps
+            </span>
+          )}
         </div>
 
         <div className="relative mt-4 overflow-hidden rounded-b-2xl">
           <iframe
             title={title}
-            src={src}
+            src={googleEmbedSrc}
             className="h-[280px] w-full"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
