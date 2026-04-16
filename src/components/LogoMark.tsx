@@ -7,54 +7,37 @@ export function LogoMark({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
     >
-      {/* Hex badge (distinct silhouette) */}
-      <path
-        d="M16 4.8 26.2 10.7V21.3L16 27.2 5.8 21.3V10.7L16 4.8Z"
-        fill="transparent"
+      {/* Minimal washer mark (matches services icon language) */}
+      <rect
+        x="8"
+        y="7"
+        width="16"
+        height="18"
+        rx="5"
         stroke="var(--hero-line)"
-        strokeWidth="1.5"
+        strokeWidth="1.6"
         strokeLinejoin="round"
       />
-
-      {/* Washer door ring */}
-      <circle
-        cx="14.7"
-        cy="16.2"
-        r="6.2"
-        stroke="var(--hero-line)"
-        strokeWidth="1.4"
-      />
-      <circle
-        cx="14.7"
-        cy="16.2"
-        r="3.9"
-        stroke="var(--hero-line)"
-        strokeOpacity="0.6"
-        strokeWidth="1.2"
-      />
-
-      {/* Accent wave */}
       <path
-        d="M10.6 17.2c1.3-1.2 3-1.2 4.3 0s3 1.2 4.3 0"
+        d="M10.8 11h10.4"
+        stroke="var(--hero-line)"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <circle cx="21" cy="9.4" r="1.05" fill="var(--accent)" fillOpacity="0.85" />
+
+      <circle
+        cx="16"
+        cy="17.6"
+        r="5.3"
+        stroke="var(--hero-line)"
+        strokeWidth="1.6"
+      />
+      <path
+        d="M13 18.4c1.2-1.2 2.8-1.2 4 0s2.8 1.2 4 0"
         stroke="var(--accent)"
-        strokeOpacity="0.75"
+        strokeOpacity="0.72"
         strokeWidth="1.7"
-        strokeLinecap="round"
-      />
-
-      {/* Minimal tool mark (wrench-like) */}
-      <path
-        d="M19.2 12.3l4.2 4.2"
-        stroke="var(--accent)"
-        strokeOpacity="0.8"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <path
-        d="M23.8 17.3c.7-.7.7-1.8 0-2.5-.7-.7-1.8-.7-2.5 0"
-        stroke="var(--accent)"
-        strokeOpacity="0.55"
-        strokeWidth="1.2"
         strokeLinecap="round"
       />
     </svg>
