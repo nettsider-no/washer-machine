@@ -7,7 +7,7 @@ export function HeroVisual() {
       {/* Premium surface */}
       <div className="absolute inset-0 rounded-3xl border border-[color:var(--hero-line)] bg-[color:var(--hero-fill)] shadow-[0_28px_90px_var(--hero-shadow)] backdrop-blur-sm" />
 
-      {/* Isometric 3D lineart: washing machine */}
+      {/* Isometric 3D lineart hero (door + tools) */}
       <svg
         className="absolute inset-0 h-full w-full"
         viewBox="0 0 520 360"
@@ -16,133 +16,149 @@ export function HeroVisual() {
         preserveAspectRatio="xMidYMid meet"
       >
         <defs>
-          <linearGradient id="iso_front" x1="230" y1="110" x2="410" y2="300" gradientUnits="userSpaceOnUse">
-            <stop stopColor="var(--accent)" stopOpacity="0.14" />
+          <linearGradient id="isoFront" x1="220" y1="78" x2="420" y2="312" gradientUnits="userSpaceOnUse">
+            <stop stopColor="var(--accent)" stopOpacity="0.12" />
             <stop offset="1" stopColor="var(--foreground)" stopOpacity="0.02" />
           </linearGradient>
+          <radialGradient id="shadow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(308 304) rotate(90) scale(34 128)">
+            <stop stopColor="var(--foreground)" stopOpacity="0.18" />
+            <stop offset="1" stopColor="var(--foreground)" stopOpacity="0" />
+          </radialGradient>
         </defs>
 
         {/* Outer frame */}
         <rect x="64" y="44" width="392" height="272" rx="34" stroke="var(--hero-line)" strokeWidth="1.2" />
 
-        {/* Alternate hero: isometric washer + minimal toolbox */}
-        <g transform="translate(0 6)">
-          {/* Ground plane */}
-          <path
-            d="M166 294 L354 294 L414 326 L226 326 Z"
-            fill="transparent"
-            stroke="var(--hero-line)"
-            strokeWidth="1.1"
-            strokeLinejoin="round"
-            opacity="0.85"
-          />
+        {/* Ground shadow */}
+        <ellipse cx="308" cy="304" rx="132" ry="34" fill="url(#shadow)" />
 
-          {/* Washer: top */}
+        <g transform="translate(0 2)">
+          {/* Main washer block (isometric) */}
           <path
-            d="M210 98 L336 98 L382 124 L256 124 Z"
+            d="M222 88 L336 88 L392 122 L278 122 Z"
             fill="transparent"
             stroke="var(--hero-line)"
-            strokeWidth="1.3"
+            strokeWidth="1.25"
             strokeLinejoin="round"
           />
-          {/* Washer: left */}
           <path
-            d="M210 98 L256 124 L256 292 L210 266 Z"
+            d="M222 88 L278 122 L278 292 L222 260 Z"
             fill="transparent"
             stroke="var(--hero-line)"
-            strokeWidth="1.3"
+            strokeWidth="1.25"
             strokeLinejoin="round"
           />
-          {/* Washer: front */}
           <path
-            d="M256 124 L382 124 L382 292 L256 292 Z"
-            fill="url(#iso_front)"
+            d="M278 122 L392 122 L392 292 L278 292 Z"
+            fill="url(#isoFront)"
             stroke="var(--hero-line)"
-            strokeWidth="1.5"
+            strokeWidth="1.45"
             strokeLinejoin="round"
           />
 
-          {/* Panel */}
+          {/* Control panel */}
           <path
-            d="M266 140 L372 140 L372 158 L266 158 Z"
+            d="M288 140 L382 140 L382 158 L288 158 Z"
             fill="transparent"
             stroke="var(--hero-line)"
-            strokeWidth="1.2"
+            strokeWidth="1.15"
             strokeLinejoin="round"
           />
-          <circle cx="356" cy="149" r="6.2" fill="transparent" stroke="var(--hero-line)" strokeWidth="1.2" />
-          <circle cx="334" cy="149" r="6.2" fill="transparent" stroke="var(--hero-line)" strokeWidth="1.2" />
+          <circle cx="366" cy="149" r="6.2" fill="transparent" stroke="var(--hero-line)" strokeWidth="1.15" />
+          <circle cx="344" cy="149" r="6.2" fill="transparent" stroke="var(--hero-line)" strokeWidth="1.15" />
 
-          {/* Door */}
+          {/* Door ring */}
           <ellipse
-            cx="319"
+            cx="336"
             cy="222"
-            rx="56"
-            ry="50"
+            rx="54"
+            ry="48"
             fill="transparent"
             stroke="var(--hero-ink)"
             strokeOpacity="0.22"
             strokeWidth="2"
           />
           <ellipse
-            cx="319"
+            cx="336"
             cy="222"
-            rx="40"
-            ry="36"
+            rx="38"
+            ry="34"
             fill="transparent"
             stroke="var(--hero-line)"
-            strokeWidth="1.4"
+            strokeWidth="1.35"
           />
 
-          {/* Swirl (slightly different than waves) */}
+          {/* Door opened (separate) */}
+          <g transform="translate(0 0)" opacity="0.98">
+            <path
+              d="M156 152 L236 152 L266 172 L186 172 Z"
+              fill="transparent"
+              stroke="var(--hero-line)"
+              strokeWidth="1.2"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M186 172 L266 172 L266 254 L186 254 Z"
+              fill="transparent"
+              stroke="var(--hero-line)"
+              strokeWidth="1.2"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M156 152 L186 172 L186 254 L156 234 Z"
+              fill="transparent"
+              stroke="var(--hero-line)"
+              strokeWidth="1.2"
+              strokeLinejoin="round"
+            />
+            <ellipse
+              cx="226"
+              cy="214"
+              rx="28"
+              ry="24"
+              fill="transparent"
+              stroke="var(--accent)"
+              strokeOpacity="0.28"
+              strokeWidth="2"
+            />
+            <ellipse
+              cx="226"
+              cy="214"
+              rx="18"
+              ry="16"
+              fill="transparent"
+              stroke="var(--hero-line)"
+              strokeWidth="1.2"
+            />
+          </g>
+
+          {/* Subtle water swirl inside main door */}
           <path
-            d="M296 232c12-16 38-18 52-4 10 10 8 26-6 34-14 8-34 2-42-12"
+            d="M312 232c10-14 34-16 46-4 9 9 7 23-5 30-12 7-30 2-38-10"
             stroke="var(--accent)"
             strokeOpacity="0.5"
             strokeWidth="2"
             strokeLinecap="round"
           />
           <path
-            d="M306 250c7 8 18 10 26 6"
-            stroke="var(--accent)"
-            strokeOpacity="0.28"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-
-          {/* Toolbox: top */}
-          <path
-            d="M150 210 L196 210 L216 222 L170 222 Z"
-            fill="transparent"
-            stroke="var(--hero-line)"
-            strokeWidth="1.2"
-            strokeLinejoin="round"
-          />
-          {/* Toolbox: front */}
-          <path
-            d="M170 222 L216 222 L216 256 L170 256 Z"
-            fill="transparent"
-            stroke="var(--hero-line)"
-            strokeWidth="1.2"
-            strokeLinejoin="round"
-          />
-          {/* Toolbox: left */}
-          <path
-            d="M150 210 L170 222 L170 256 L150 244 Z"
-            fill="transparent"
-            stroke="var(--hero-line)"
-            strokeWidth="1.2"
-            strokeLinejoin="round"
-          />
-          {/* Toolbox handle */}
-          <path
-            d="M176 218c0-6 5-10 12-10s12 4 12 10"
-            fill="transparent"
+            d="M320 248c6 7 16 9 23 6"
             stroke="var(--accent)"
             strokeOpacity="0.26"
             strokeWidth="2"
             strokeLinecap="round"
           />
+
+          {/* Floating small tools */}
+          <g stroke="var(--hero-line)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.9">
+            <path d="M410 170l18-10" />
+            <path d="M404 176l18-10" />
+            <path d="M180 118l16 8" />
+            <path d="M176 126l16 8" />
+          </g>
+          <g stroke="var(--hero-line)" strokeWidth="1.25" opacity="0.85">
+            <circle cx="416" cy="236" r="10" fill="transparent" />
+            <path d="M416 222v6M416 244v6M402 236h6M424 236h6" strokeLinecap="round" />
+          </g>
         </g>
       </svg>
     </div>

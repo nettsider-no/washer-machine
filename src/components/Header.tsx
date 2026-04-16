@@ -13,13 +13,22 @@ export function Header() {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
         <a
           href="#top"
-          className="group font-[family-name:var(--font-display)] text-sm font-semibold tracking-tight text-[var(--foreground)] transition-colors duration-200 hover:text-[color:var(--accent-ink)] active:translate-y-px active:scale-[0.98] sm:text-base"
+          className="group flex items-center gap-2 font-[family-name:var(--font-display)] text-sm font-semibold tracking-tight text-[var(--foreground)] transition-colors duration-200 hover:text-[color:var(--accent-ink)] active:translate-y-px active:scale-[0.98] sm:text-base"
         >
-          WM
-          <span className="text-[color:var(--accent)] transition-colors duration-200 group-hover:text-[color:var(--accent-ink)]">
-            .
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl border border-[var(--border)] bg-[color:var(--surface)]">
+            <img
+              src="/logo.svg"
+              alt="WM Service"
+              className="h-5 w-5 text-[color:var(--foreground)]"
+            />
           </span>
-          SERVICE
+          <span>
+            WM
+            <span className="text-[color:var(--accent)] transition-colors duration-200 group-hover:text-[color:var(--accent-ink)]">
+              .
+            </span>
+            SERVICE
+          </span>
         </a>
         <nav className="hidden items-center gap-8 text-sm text-[var(--muted)] md:flex">
           <a
