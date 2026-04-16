@@ -38,6 +38,8 @@ function buildCsp(dev: boolean): string {
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
     "connect-src 'self'",
+    // Allow embedding Google Maps (Apple Maps is opened via deep-link, not iframed).
+    "frame-src 'self' https://www.google.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
