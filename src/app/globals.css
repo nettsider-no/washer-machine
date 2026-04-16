@@ -210,6 +210,8 @@ html[data-theme="dark"] {
   gap: 0.75rem;
   padding: 0.875rem 1rem;
   width: max-content;
+  flex-wrap: nowrap;
+  white-space: nowrap;
   animation: wash-marquee 26s linear infinite;
   will-change: transform;
 }
@@ -217,8 +219,9 @@ html[data-theme="dark"] {
 .wash-marquee__item {
   display: inline-flex;
   align-items: center;
+  gap: 0.6rem;
   height: 2.25rem;
-  padding: 0 0.9rem;
+  padding: 0 0.95rem 0 0.7rem;
   border-radius: 9999px;
   border: 1px solid var(--border);
   background: var(--surface-strong);
@@ -227,6 +230,26 @@ html[data-theme="dark"] {
   font-weight: 600;
   letter-spacing: -0.01em;
   white-space: nowrap;
+}
+
+.wash-marquee__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.5rem;
+  min-width: 1.5rem;
+  padding: 0 0.35rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-strong), var(--accent-bg) 35%);
+  color: var(--foreground);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.wash-marquee__name {
+  line-height: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {

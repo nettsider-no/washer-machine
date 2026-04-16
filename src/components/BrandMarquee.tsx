@@ -13,6 +13,35 @@ const BRANDS = [
   "Miele",
 ] as const;
 
+type Brand = (typeof BRANDS)[number];
+
+const BRAND_MARK: Record<Brand, string> = {
+  Samsung: "SA",
+  LG: "LG",
+  Bosch: "BO",
+  Siemens: "SI",
+  Electrolux: "EL",
+  AEG: "AE",
+  Whirlpool: "WH",
+  Indesit: "IN",
+  Ariston: "AR",
+  Beko: "BE",
+  Zanussi: "ZA",
+  Miele: "MI",
+};
+
+function BrandItem({ brand }: { brand: Brand }) {
+  const mark = BRAND_MARK[brand];
+  return (
+    <span className="wash-marquee__item">
+      <span className="wash-marquee__logo" aria-hidden>
+        {mark}
+      </span>
+      <span className="wash-marquee__name">{brand}</span>
+    </span>
+  );
+}
+
 export function BrandMarquee({
   className,
   label = "Brands we service",
@@ -27,16 +56,12 @@ export function BrandMarquee({
         <div className="wash-marquee relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[color:var(--surface)]">
           <div className="wash-marquee__track" aria-hidden>
             {BRANDS.map((b) => (
-              <span key={`a-${b}`} className="wash-marquee__item">
-                {b}
-              </span>
+              <BrandItem key={`a-${b}`} brand={b} />
             ))}
           </div>
           <div className="wash-marquee__track" aria-hidden>
             {BRANDS.map((b) => (
-              <span key={`b-${b}`} className="wash-marquee__item">
-                {b}
-              </span>
+              <BrandItem key={`b-${b}`} brand={b} />
             ))}
           </div>
         </div>
