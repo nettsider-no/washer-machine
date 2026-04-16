@@ -82,6 +82,7 @@ export function HomePage() {
           title={t.areaTitle}
           lead={t.areaLead}
           bullets={t.areaBullets}
+          mapTitle={t.areaMapTitle}
           mapCaption={t.areaMapCaption}
           primaryLabel={t.areaPrimaryLabel}
           secondaryLabel={t.areaSecondaryLabel}

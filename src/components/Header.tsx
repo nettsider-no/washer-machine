@@ -29,6 +29,12 @@ export function Header() {
             {t.navServices}
           </a>
           <a
+            href="#area"
+            className="relative transition-colors duration-200 after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[color:var(--accent-border)] after:transition-transform after:duration-200 hover:text-[var(--foreground)] hover:after:scale-x-100"
+          >
+            {t.navArea}
+          </a>
+          <a
             href="#request"
             className="relative transition-colors duration-200 after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[color:var(--accent-border)] after:transition-transform after:duration-200 hover:text-[var(--foreground)] hover:after:scale-x-100"
           >

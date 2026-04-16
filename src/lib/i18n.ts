@@ -36,6 +36,7 @@ export type Messages = {
   metaDescription: string;
   navServices: string;
   navContact: string;
+  navArea: string;
   navRequest: string;
   heroTitle: string;
   heroSubtitle: string;
@@ -46,6 +47,7 @@ export type Messages = {
   areaTitle: string;
   areaLead: string;
   areaBullets: string[];
+  areaMapTitle: string;
   areaMapCaption: string;
   areaPrimaryLabel: string;
   areaSecondaryLabel: string;
@@ -112,6 +114,7 @@ export const messages: Record<Locale, Messages> = {
       "Profesjonell reparasjon og service av vaskemaskiner. Hurtig respons, erfaring, hele Norge.",
     navServices: "Tjenester",
     navContact: "Kontakt",
+    navArea: "Område",
     navRequest: "Bestill",
     heroTitle: "VASKEREPARASJON",
     heroSubtitle:
@@ -147,6 +150,7 @@ export const messages: Record<Locale, Messages> = {
       "Vi avtaler tidspunkt på forhånd. Du får et bekreftet tidsvindu.",
       "Transportsone kan påvirke pris — vi sier alltid ifra før vi starter.",
     ],
+    areaMapTitle: "Oslo og region",
     areaMapCaption: "Serviceområde (forenklet kart)",
     areaPrimaryLabel: "Oslo + region",
     areaSecondaryLabel: "Utenfor sonen: spør",
@@ -222,6 +226,7 @@ export const messages: Record<Locale, Messages> = {
       "Профессиональный ремонт и обслуживание стиральных машин. Быстрый выезд, опыт, работа по всей Норвегии.",
     navServices: "Услуги",
     navContact: "Контакты",
+    navArea: "Зона",
     navRequest: "Заявка",
     heroTitle: "РЕМОНТ СТИРАЛЬНЫХ МАШИН",
     heroSubtitle:
@@ -257,6 +262,7 @@ export const messages: Record<Locale, Messages> = {
       "Время визита подтверждаем заранее, приезжаем в согласованное окно.",
       "Дальность может влиять на стоимость — всегда предупреждаем до начала работ.",
     ],
+    areaMapTitle: "Осло и регион",
     areaMapCaption: "Зона выезда (схематичная карта)",
     areaPrimaryLabel: "Осло + регион",
     areaSecondaryLabel: "Вне зоны: уточнить",
@@ -333,6 +339,7 @@ export const messages: Record<Locale, Messages> = {
       "Professional washing machine repair and maintenance. Fast response, experienced technician, serving Norway.",
     navServices: "Services",
     navContact: "Contact",
+    navArea: "Area",
     navRequest: "Book",
     heroTitle: "WASHING MACHINE REPAIR",
     heroSubtitle:
@@ -368,6 +375,7 @@ export const messages: Record<Locale, Messages> = {
       "We confirm a time window in advance — no surprise visits.",
       "Travel distance can affect the price — we always confirm before any work starts.",
     ],
+    areaMapTitle: "Oslo + region",
     areaMapCaption: "Service coverage (simplified map)",
     areaPrimaryLabel: "Oslo + region",
     areaSecondaryLabel: "Outside zone: ask",
