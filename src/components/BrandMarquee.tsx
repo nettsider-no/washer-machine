@@ -15,28 +15,9 @@ const BRANDS = [
 
 type Brand = (typeof BRANDS)[number];
 
-const BRAND_MARK: Record<Brand, string> = {
-  Samsung: "SA",
-  LG: "LG",
-  Bosch: "BO",
-  Siemens: "SI",
-  Electrolux: "EL",
-  AEG: "AE",
-  Whirlpool: "WH",
-  Indesit: "IN",
-  Ariston: "AR",
-  Beko: "BE",
-  Zanussi: "ZA",
-  Miele: "MI",
-};
-
 function BrandItem({ brand }: { brand: Brand }) {
-  const mark = BRAND_MARK[brand];
   return (
     <span className="wash-marquee__item">
-      <span className="wash-marquee__logo" aria-hidden>
-        {mark}
-      </span>
       <span className="wash-marquee__name">{brand}</span>
     </span>
   );
