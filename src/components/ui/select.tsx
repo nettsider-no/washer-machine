@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { Check, ChevronDown, ChevronUp } from "lucide-react";
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 
 import { cn } from "@/lib/utils";
 
@@ -19,14 +19,14 @@ function SelectTrigger({
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       className={cn(
-        "flex h-11 w-full items-center justify-between gap-2 rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-sm text-[var(--foreground)] outline-none ring-cyan-500/40 transition-[border-color,box-shadow] duration-200 data-[placeholder]:text-[var(--muted)] focus:border-cyan-500/50 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60",
+        "flex h-11 w-full items-center justify-between gap-2 rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-sm text-[var(--foreground)] outline-none ring-[color:var(--focus-ring)] transition-[border-color,box-shadow] duration-200 data-[placeholder]:text-[var(--muted)] focus:border-[color:var(--accent-border)] focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60",
         className
       )}
       {...props}
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDown className="h-4 w-4 text-[var(--muted)]" />
+        <ChevronDownIcon className="h-4 w-4 text-[var(--muted)]" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
@@ -51,13 +51,13 @@ function SelectContent({
         {...props}
       >
         <SelectPrimitive.ScrollUpButton className="flex items-center justify-center py-1 text-[var(--muted)]">
-          <ChevronUp className="h-4 w-4" />
+          <ChevronUpIcon className="h-4 w-4" />
         </SelectPrimitive.ScrollUpButton>
         <SelectPrimitive.Viewport className="max-h-[var(--radix-select-content-available-height)] overflow-y-auto p-2">
           {children}
         </SelectPrimitive.Viewport>
         <SelectPrimitive.ScrollDownButton className="flex items-center justify-center py-1 text-[var(--muted)]">
-          <ChevronDown className="h-4 w-4" />
+          <ChevronDownIcon className="h-4 w-4" />
         </SelectPrimitive.ScrollDownButton>
       </SelectPrimitive.Content>
     </SelectPrimitive.Portal>
@@ -92,7 +92,7 @@ function SelectItem({
     >
       <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
         <SelectPrimitive.ItemIndicator>
-          <Check className="h-4 w-4 text-[color:var(--accent-cyan)]" />
+          <CheckIcon className="h-4 w-4 text-[color:var(--accent)]" />
         </SelectPrimitive.ItemIndicator>
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>

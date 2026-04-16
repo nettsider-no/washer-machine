@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
-import { Inter, Russo_One } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 import { LocaleProvider } from "@/components/LocaleProvider";
 import { messages, resolveInitialLocale } from "@/lib/i18n";
 
-const display = Russo_One({
-  weight: "400",
-  subsets: ["latin", "cyrillic"],
+const display = Manrope({
+  weight: ["600", "700"],
+  subsets: ["latin", "latin-ext", "cyrillic"],
   variable: "--font-display",
 });
 
-const sans = Inter({
+const sans = Manrope({
+  weight: ["400", "500", "600"],
   subsets: ["latin", "latin-ext", "cyrillic"],
   variable: "--font-sans-body",
 });

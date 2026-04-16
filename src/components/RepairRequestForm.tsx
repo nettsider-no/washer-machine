@@ -5,7 +5,13 @@ import { IMaskInput } from "react-imask";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle2, Loader2, Paperclip, ShieldCheck, X } from "lucide-react";
+import {
+  CheckCircledIcon,
+  Cross2Icon,
+  LockClosedIcon,
+  CrumpledPaperIcon,
+  ReloadIcon,
+} from "@radix-ui/react-icons";
 
 import { useLocale } from "./LocaleProvider";
 import {
@@ -287,8 +293,8 @@ export function RepairRequestForm() {
         <DialogContent>
           <DialogHeader>
             <div className="flex items-start gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-500/10">
-                <CheckCircle2 className="h-6 w-6 text-cyan-200" />
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[color:var(--accent-border)] bg-[color:var(--accent-bg)]">
+                <CheckCircledIcon className="h-6 w-6 text-[color:var(--accent-ink)]" />
               </div>
               <div className="min-w-0">
                 <DialogTitle>{t.reqSuccessTitle}</DialogTitle>
@@ -306,7 +312,7 @@ export function RepairRequestForm() {
         </DialogContent>
       </Dialog>
 
-      <Card className="mx-auto max-w-3xl transition-[box-shadow,border-color] duration-300 hover:border-cyan-500/25 hover:shadow-[0_0_48px_rgba(34,211,238,0.06)]">
+      <Card className="mx-auto max-w-3xl transition-[box-shadow,border-color] duration-300 hover:border-[color:var(--accent-border)]">
         <CardHeader>
           <CardTitle>{t.requestFormTitle}</CardTitle>
           <CardDescription>{t.requestFormHint}</CardDescription>
@@ -347,7 +353,7 @@ export function RepairRequestForm() {
                 {...form.register("name")}
               />
               {form.formState.errors.name?.message && (
-                <p className="mt-1 text-xs text-amber-300">
+                <p className="mt-1 text-xs text-[color:var(--danger)]">
                   {form.formState.errors.name.message}
                 </p>
               )}
@@ -363,7 +369,7 @@ export function RepairRequestForm() {
                 inputMode="tel"
                 autoComplete="tel"
                 className={cn(
-                  "flex h-11 w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-cyan-500/40 placeholder:text-[color:var(--field-placeholder)] focus:border-cyan-500/50 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60"
+                  "flex h-11 w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-[color:var(--focus-ring)] placeholder:text-[color:var(--field-placeholder)] focus:border-[color:var(--accent-border)] focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60"
                 )}
                 placeholder="+47 000 00 000"
                 value={form.watch("phone")}
@@ -372,7 +378,7 @@ export function RepairRequestForm() {
                 }
               />
               {form.formState.errors.phone?.message && (
-                <p className="mt-1 text-xs text-amber-300">
+                <p className="mt-1 text-xs text-[color:var(--danger)]">
                   {form.formState.errors.phone.message}
                 </p>
               )}
@@ -448,7 +454,7 @@ export function RepairRequestForm() {
               ))}
             </div>
             {form.formState.errors.issue?.message && (
-              <p className="mt-2 text-xs text-amber-300">
+              <p className="mt-2 text-xs text-[color:var(--danger)]">
                 {form.formState.errors.issue.message}
               </p>
             )}
@@ -486,7 +492,7 @@ export function RepairRequestForm() {
                   />
                   <p className="mt-3 text-xs text-[var(--muted)]">{t.reqTimezoneNote}</p>
                   {form.formState.errors.slotKey?.message && (
-                    <p className="mt-1 text-xs text-amber-300">
+                    <p className="mt-1 text-xs text-[color:var(--danger)]">
                       {form.formState.errors.slotKey.message}
                     </p>
                   )}
@@ -512,7 +518,7 @@ export function RepairRequestForm() {
                     </SelectContent>
                   </Select>
                   {form.formState.errors.time?.message && (
-                    <p className="mt-1 text-xs text-amber-300">
+                    <p className="mt-1 text-xs text-[color:var(--danger)]">
                       {form.formState.errors.time.message}
                     </p>
                   )}
@@ -536,7 +542,7 @@ export function RepairRequestForm() {
                     !canSubmit && "pointer-events-none opacity-60"
                   )}
                 >
-                  <Paperclip className="h-4 w-4 text-[var(--muted)]" />
+                  <CrumpledPaperIcon className="h-4 w-4 text-[var(--muted)]" />
                   <span>+ {t.reqMedia}</span>
                 </label>
                 <input
@@ -551,7 +557,7 @@ export function RepairRequestForm() {
                   }}
                 />
                 {files.length > 0 && (
-                  <Badge variant="cyan">
+                  <Badge variant="accent">
                     {files.length} / 3
                   </Badge>
                 )}
@@ -576,7 +582,7 @@ export function RepairRequestForm() {
                         className="rounded-lg p-2 text-[var(--muted)] transition hover:bg-[color:var(--surface-hover)] hover:text-[var(--foreground)]"
                         aria-label="Remove file"
                       >
-                        <X className="h-4 w-4" />
+                        <Cross2Icon className="h-4 w-4" />
                       </button>
                     </div>
                   ))}
@@ -586,18 +592,18 @@ export function RepairRequestForm() {
           </div>
 
           {submitState === "error" && (
-            <p className="text-sm text-amber-300">{serverError || t.reqError}</p>
+            <p className="text-sm text-[color:var(--danger)]">{serverError || t.reqError}</p>
           )}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="flex items-center gap-2 text-xs text-[var(--muted)]">
-              <ShieldCheck className="h-4 w-4 text-[color:var(--accent-cyan)]" />
+              <LockClosedIcon className="h-4 w-4 text-[color:var(--accent)]" />
               <span>* {t.reqValidationRequired}</span>
             </p>
             <Button type="submit" disabled={!canSubmit}>
               {submitState === "sending" ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <ReloadIcon className="h-4 w-4 animate-spin" />
                   {t.reqSending}
                 </>
               ) : (

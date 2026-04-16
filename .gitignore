@@ -1,3 +1,54 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Next.js / Node
+node_modules/
+.next/
+out/
+.turbo/
+.vercel/
+tsconfig.tsbuildinfo
+
+# Local tooling
+.cursor/
+
+# Local agent/IDE artifacts
+.adal/
+.agents/
+.augment/
+.bob/
+.claude/
+.codebuddy/
+.commandcode/
+.continue/
+.cortex/
+.crush/
+.factory/
+.goose/
+.iflow/
+.junie/
+.kilocode/
+.kiro/
+.kode/
+.mcpjam/
+.mux/
+.neovate/
+.openhands/
+.pi/
+.pochi/
+.qoder/
+.qwen/
+.roo/
+.trae/
+.vibe/
+.windsurf/
+.zencoder/
+
+# Taste/skill installation artifacts (local)
+skills/
+skills-lock.json
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies

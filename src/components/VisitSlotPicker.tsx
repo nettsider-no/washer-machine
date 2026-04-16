@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { DateTime } from "luxon";
 import { cn } from "@/lib/utils";
 import { nextNDatesOslo, OSLO, parseSlotId, SLOT_DAYS_AHEAD } from "@/lib/slotUtils";
@@ -48,16 +48,9 @@ export function VisitSlotPicker({
   const dates = useMemo(() => nextNDatesOslo(SLOT_DAYS_AHEAD), []);
   const byDate = useMemo(() => groupByDate(slots), [slots]);
 
-  const [pickedDate, setPickedDate] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!value?.trim()) {
-      setPickedDate(null);
-      return;
-    }
-    const p = parseSlotId(value);
-    setPickedDate(p?.d ?? null);
-  }, [value]);
+  const [pickedDate, setPickedDate] = useState<string | null>(
+    () => parseSlotId(value)?.d ?? null
+  );
 
   const loc = luxonLocale(locale);
 
@@ -96,10 +89,10 @@ export function VisitSlotPicker({
                     "cursor-not-allowed border-[var(--border)] bg-[color:var(--surface)] opacity-45",
                   hasSlots &&
                     !isPicked &&
-                    "border-[var(--border)] bg-[color:var(--surface)] hover:border-cyan-500/40 hover:bg-[color:var(--surface-hover)]",
+                    "border-[var(--border)] bg-[color:var(--surface)] hover:border-[color:var(--accent-border)] hover:bg-[color:var(--surface-hover)]",
                   hasSlots &&
                     isPicked &&
-                    "border-cyan-400/60 bg-cyan-500/15 shadow-[0_0_20px_rgba(34,211,238,0.12)]"
+                    "border-[color:var(--accent-border)] bg-[color:var(--accent-bg)] shadow-[0_20px_60px_-45px_rgba(2,6,23,0.55)]"
                 )}
               >
                 <span className="text-[10px] font-medium uppercase leading-tight text-[var(--muted)]">
@@ -135,8 +128,8 @@ export function VisitSlotPicker({
                   className={cn(
                     "min-w-[4.5rem] rounded-lg border px-3 py-2 text-sm font-semibold transition",
                     active
-                      ? "border-cyan-400/60 bg-cyan-500/20 text-[color:var(--accent-cyan)]"
-                      : "border-[var(--border)] bg-[color:var(--surface)] text-[var(--foreground)] hover:border-[color:var(--border)]"
+                      ? "border-[color:var(--accent-border)] bg-[color:var(--accent-bg)] text-[color:var(--accent-ink)]"
+                      : "border-[var(--border)] bg-[color:var(--surface)] text-[var(--foreground)] hover:border-[color:var(--accent-border)]"
                   )}
                 >
                   {label}
@@ -148,7 +141,7 @@ export function VisitSlotPicker({
       )}
 
       {pickedDate && timesForDay.length === 0 && (
-        <p className="text-sm text-amber-300/90">
+        <p className="text-sm text-[color:var(--warning)]">
           {locale === "ru"
             ? "На этот день слотов уже нет — выберите другой день."
             : locale === "no"

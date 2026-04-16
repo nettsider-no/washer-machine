@@ -74,7 +74,7 @@ async function refreshCard(o: OrderRow, messageRef?: CardMessageRef) {
     chat_id: target.chat_id,
     message_id: target.message_id,
     text: formatOrderHtml(o),
-    reply_markup: orderKeyboard(o.id, o.status),
+    reply_markup: orderKeyboard(o.id),
   });
   if (!res.ok) {
     const desc = String(res.json?.description ?? "");
@@ -135,7 +135,7 @@ export async function POST(request: Request) {
               chat_id: msg.chat.id,
               message_id: mid,
               text: formatOrderHtml(stale),
-              reply_markup: orderKeyboard(stale.id, stale.status),
+              reply_markup: orderKeyboard(stale.id),
             });
             return NextResponse.json({ ok: true });
           }
@@ -208,14 +208,14 @@ export async function POST(request: Request) {
         const orders = await listActiveOrders();
         const lines = orders.map((o, i) => {
           const when = `${o.visit_date ?? "—"} ${o.visit_time ?? "—"}`.trim();
-          const s = o.status === "new" ? "🆕" : "🔧";
-          return `${i + 1}. ${s} <b>${o.name}</b> · ${o.phone} · <code>${o.id.slice(0, 8)}</code> · ${when}`;
+          const s = o.status === "new" ? "Новая" : "В работе";
+          return `${i + 1}. ${s} · <b>${o.name}</b> · ${o.phone} · <code>${o.id.slice(0, 8)}</code> · ${when}`;
         });
         await sendTelegramMessage({
           chat_id: chatId,
           text:
-            `📋 <b>Активные заявки</b> (${orders.length})\n` +
-            "━━━━━━━━━━━━━━━━━━━━\n" +
+            `<b>Активные заявки</b> (${orders.length})\n` +
+            "--------------------\n" +
             (lines.length ? lines.join("\n") : "— пусто —"),
         });
         return NextResponse.json({ ok: true });

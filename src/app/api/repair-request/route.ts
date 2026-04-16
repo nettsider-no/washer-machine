@@ -211,7 +211,7 @@ export async function POST(request: Request) {
   const msg = await sendTelegramMessage({
     chat_id: chatId,
     text: cardText,
-    reply_markup: orderKeyboard(inserted.id, inserted.status),
+    reply_markup: orderKeyboard(inserted.id),
   });
   if (!msg.ok) {
     console.error("[api/repair-request] Telegram API error", msg.json);

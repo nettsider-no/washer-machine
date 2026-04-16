@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { DateTime } from "luxon";
-import { Loader2 } from "lucide-react";
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import {
   hourRange,
@@ -47,6 +48,8 @@ export function AdminPanel() {
   const [orders, setOrders] = useState<AdminOrderRow[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [orderActionId, setOrderActionId] = useState<string | null>(null);
+  const [dangerConfirmId, setDangerConfirmId] = useState<string | null>(null);
+  const [inlineError, setInlineError] = useState<string | null>(null);
 
   const loadOrders = useCallback(async (opts?: { silent?: boolean }) => {
     if (!opts?.silent) setOrdersLoading(true);
@@ -143,12 +146,7 @@ export function AdminPanel() {
   }, [authed, loadOrders]);
 
   async function cancelOrder(id: string, mode: "cancel" | "cancel_and_hide_slot") {
-    if (mode === "cancel_and_hide_slot") {
-      const ok = window.confirm(
-        "Отменить заявку и убрать этот час из расписания на сайте? Клиенты больше не смогут выбрать это время, пока вы снова не отметите час в сетке ниже и не сохраните."
-      );
-      if (!ok) return;
-    }
+    setInlineError(null);
     setOrderActionId(id);
     try {
       const r = await fetch(`/api/admin/orders/${id}`, {
@@ -163,15 +161,18 @@ export function AdminPanel() {
       }
       if (!r.ok) {
         const j = (await r.json().catch(() => null)) as { error?: string } | null;
-        window.alert(j?.error === "not_active" ? "Заявка уже не активна." : "Не удалось выполнить.");
+        setInlineError(
+          j?.error === "not_active" ? "Заявка уже не активна." : "Не удалось выполнить."
+        );
         return;
       }
       void load({ silent: true });
       void loadOrders({ silent: true });
     } catch {
-      window.alert("Ошибка сети");
+      setInlineError("Ошибка сети");
     } finally {
       setOrderActionId(null);
+      setDangerConfirmId(null);
     }
   }
 
@@ -279,7 +280,7 @@ export function AdminPanel() {
   if (authed === null || loading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center text-[var(--muted)]">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <ReloadIcon className="h-8 w-8 animate-spin" />
       </div>
     );
   }
@@ -291,7 +292,7 @@ export function AdminPanel() {
           Панель: слоты выезда
         </h1>
         <p className="mb-6 text-sm text-[var(--muted)]">
-          Введите пароль из переменной <code className="text-[color:var(--accent-cyan)]">ADMIN_PASSWORD</code> на
+          Введите пароль из переменной <code className="text-[color:var(--accent)]">ADMIN_PASSWORD</code> на
           сервере.
         </p>
         <form onSubmit={login} className="grid gap-4">
@@ -306,7 +307,7 @@ export function AdminPanel() {
               className="mt-1"
             />
           </div>
-          {loginError && <p className="text-sm text-amber-300">{loginError}</p>}
+          {loginError && <p className="text-sm text-[color:var(--danger)]">{loginError}</p>}
           <Button type="submit" disabled={loading}>
             Войти
           </Button>
@@ -353,9 +354,12 @@ export function AdminPanel() {
         <p className="mb-4 text-sm text-[var(--muted)]">
           Новые и в работе. После отмены слот освобождается для других клиентов.
         </p>
+        {inlineError ? (
+          <p className="mb-3 text-sm text-[color:var(--danger)]">{inlineError}</p>
+        ) : null}
         {ordersLoading && orders.length === 0 ? (
           <div className="flex justify-center py-6 text-[var(--muted)]">
-            <Loader2 className="h-6 w-6 animate-spin" />
+            <ReloadIcon className="h-6 w-6 animate-spin" />
           </div>
         ) : orders.length === 0 ? (
           <p className="text-sm text-[var(--muted)]">Нет активных заявок.</p>
@@ -371,7 +375,7 @@ export function AdminPanel() {
                     <span className="font-medium text-[var(--foreground)]">{o.name}</span>
                     <span className="text-[var(--muted)]"> · {o.phone}</span>
                     <div className="mt-1 text-xs text-[var(--muted)]">
-                      {o.status === "new" ? "🆕 Новая" : "🔧 В работе"} · {orderSlotLabel(o)}
+                      {o.status === "new" ? "Новая" : "В работе"} · {orderSlotLabel(o)}
                     </div>
                     <div className="font-mono text-[10px] text-[var(--muted)]">{o.id}</div>
                   </div>
@@ -384,7 +388,7 @@ export function AdminPanel() {
                       onClick={() => void cancelOrder(o.id, "cancel")}
                     >
                       {orderActionId === o.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <ReloadIcon className="h-4 w-4 animate-spin" />
                       ) : (
                         "Отменить заявку"
                       )}
@@ -394,15 +398,45 @@ export function AdminPanel() {
                         type="button"
                         variant="secondary"
                         size="sm"
-                        className="border border-[color:var(--accent-amber-border)] text-[color:var(--accent-amber)] hover:bg-[color:var(--surface-hover)]"
+                        className="border border-[color:var(--warning-border)] text-[color:var(--warning)] hover:bg-[color:var(--surface-hover)]"
                         disabled={orderActionId === o.id}
-                        onClick={() => void cancelOrder(o.id, "cancel_and_hide_slot")}
+                        onClick={() =>
+                          setDangerConfirmId((cur) => (cur === o.id ? null : o.id))
+                        }
                       >
                         Отменить и убрать час с сайта
                       </Button>
                     ) : null}
                   </div>
                 </div>
+                {dangerConfirmId === o.id ? (
+                  <div className="mt-3 rounded-xl border border-[color:var(--warning-border)] bg-[color:var(--warning-bg)] px-3 py-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <p className="text-xs text-[var(--foreground)]">
+                        Это отменит заявку и скроет час с сайта, пока вы снова не включите его в сетке
+                        ниже и не сохраните.
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          disabled={orderActionId === o.id}
+                          onClick={() => void cancelOrder(o.id, "cancel_and_hide_slot")}
+                        >
+                          Подтвердить
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => setDangerConfirmId(null)}
+                        >
+                          Отмена
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -415,7 +449,7 @@ export function AdminPanel() {
             key={d}
             className="rounded-2xl border border-[var(--border)] bg-[color:var(--surface)] p-4 backdrop-blur-sm"
           >
-            <p className="mb-3 font-semibold capitalize text-[color:var(--accent-cyan)]">{dayTitle(d)}</p>
+            <p className="mb-3 font-semibold capitalize text-[color:var(--foreground)]">{dayTitle(d)}</p>
             <div className="flex flex-wrap gap-2">
               {hours.map((h) => {
                 const id = slotId(d, h);
@@ -428,21 +462,25 @@ export function AdminPanel() {
                     onClick={() => toggle(d, h)}
                     className={cn(
                       "flex min-w-[4.5rem] flex-col items-center justify-center rounded-lg border px-2 py-1.5 text-sm font-medium transition",
-                      on && !isBooked && "border-cyan-400/50 bg-cyan-500/20 text-cyan-100",
+                      on &&
+                        !isBooked &&
+                        "border-[color:var(--accent-border)] bg-[color:var(--accent-bg)] text-[var(--foreground)]",
                       on &&
                         isBooked &&
-                        "border-amber-400/55 bg-amber-500/15 text-amber-100 shadow-[0_0_12px_rgba(245,158,11,0.12)]",
+                        "border-[color:var(--warning-border)] bg-[color:var(--warning-bg)] text-[var(--foreground)]",
                       !on &&
                         isBooked &&
-                        "border-amber-500/40 bg-amber-950/30 text-amber-100/90",
-                      !on && !isBooked && "border-[var(--border)] bg-[color:var(--surface)] text-[var(--muted)] hover:border-cyan-500/25"
+                        "border-[color:var(--warning-border)] bg-[color:var(--surface)] text-[var(--foreground)]",
+                      !on &&
+                        !isBooked &&
+                        "border-[var(--border)] bg-[color:var(--surface)] text-[var(--muted)] hover:border-[color:var(--accent-border)]"
                     )}
                   >
                     <span>{String(h).padStart(2, "0")}:00</span>
                     {isBooked && (
-                      <span className="mt-0.5 text-[9px] font-bold uppercase leading-none text-[color:var(--accent-amber)]">
+                      <Badge className="mt-1" variant="warning">
                         Занято
-                      </span>
+                      </Badge>
                     )}
                   </button>
                 );
@@ -456,7 +494,7 @@ export function AdminPanel() {
         <Button type="button" onClick={() => void save()} disabled={saving}>
           {saving ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
               Сохранение…
             </>
           ) : (

@@ -4,9 +4,6 @@ export function HeroVisual() {
       className="relative h-[280px] w-full max-w-lg sm:h-[360px]"
       aria-hidden
     >
-      {/* Soft, theme-aware glow */}
-      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[color:var(--hero-glow-cyan)] via-transparent to-[color:var(--hero-glow-fuchsia)] blur-2xl" />
-
       {/* Premium surface */}
       <div className="absolute inset-0 rounded-3xl border border-[color:var(--hero-line)] bg-[color:var(--hero-fill)] shadow-[0_28px_90px_var(--hero-shadow)] backdrop-blur-sm" />
 
@@ -20,9 +17,9 @@ export function HeroVisual() {
       >
         <defs>
           <linearGradient id="wm_accent" x1="110" y1="70" x2="430" y2="300" gradientUnits="userSpaceOnUse">
-            <stop stopColor="var(--accent-cyan)" stopOpacity="0.28" />
-            <stop offset="0.55" stopColor="var(--accent-cyan)" stopOpacity="0.05" />
-            <stop offset="1" stopColor="var(--accent-fuchsia)" stopOpacity="0.18" />
+            <stop stopColor="var(--accent)" stopOpacity="0.22" />
+            <stop offset="0.6" stopColor="var(--accent)" stopOpacity="0.06" />
+            <stop offset="1" stopColor="var(--foreground)" stopOpacity="0.04" />
           </linearGradient>
         </defs>
 
@@ -82,14 +79,14 @@ export function HeroVisual() {
         {/* Water waves inside door */}
         <path
           d="M218 214c14-12 32-12 46 0s32 12 46 0"
-          stroke="var(--accent-cyan)"
+          stroke="var(--accent)"
           strokeOpacity="0.55"
           strokeWidth="2"
           strokeLinecap="round"
         />
         <path
           d="M224 234c12-10 28-10 40 0s28 10 40 0"
-          stroke="var(--accent-cyan)"
+          stroke="var(--accent)"
           strokeOpacity="0.35"
           strokeWidth="2"
           strokeLinecap="round"
@@ -99,14 +96,14 @@ export function HeroVisual() {
         <path
           d="M404 138c0 10-8 18-18 18s-18-8-18-18c0-14 18-28 18-28s18 14 18 28Z"
           fill="transparent"
-          stroke="var(--accent-cyan)"
+          stroke="var(--accent)"
           strokeOpacity="0.32"
           strokeWidth="1.8"
         />
         <path
           d="M118 246c0 8-6.5 14.5-14.5 14.5S89 254 89 246c0-11 14.5-23 14.5-23s14.5 12 14.5 23Z"
           fill="transparent"
-          stroke="var(--accent-cyan)"
+          stroke="var(--accent)"
           strokeOpacity="0.22"
           strokeWidth="1.6"
         />

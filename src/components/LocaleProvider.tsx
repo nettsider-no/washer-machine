@@ -34,18 +34,16 @@ export function LocaleProvider({
   children: ReactNode;
   initialLocale: Locale;
 }) {
-  const [locale, setLocaleState] = useState<Locale>(initialLocale);
-
-  useEffect(() => {
+  const [locale, setLocaleState] = useState<Locale>(() => {
+    if (typeof window === "undefined") return initialLocale;
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored && isLocale(stored) && stored !== initialLocale) {
-        setLocaleState(stored);
-      }
+      if (stored && isLocale(stored)) return stored;
     } catch {
       /* ignore */
     }
-  }, [initialLocale]);
+    return initialLocale;
+  });
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);

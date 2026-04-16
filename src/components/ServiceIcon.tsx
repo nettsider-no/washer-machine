@@ -1,40 +1,37 @@
 /**
- * Service card icons — clearer Lucide pictograms.
+ * Service card icons.
  * Order matches `t.services` in i18n.
  */
 
-import { Plug, Sparkles, Search, Wrench } from "lucide-react";
+import {
+  GearIcon,
+  LightningBoltIcon,
+  MagicWandIcon,
+  MagnifyingGlassIcon,
+} from "@radix-ui/react-icons";
 
 const box = "h-12 w-12 sm:h-14 sm:w-14";
 
 export function ServiceIcon({ index }: { index: number }) {
-  const props = { className: box, "aria-hidden": true, strokeWidth: 1.75 };
+  const props = { className: box, "aria-hidden": true };
 
   switch (index % 4) {
     case 0:
       /* Diagnostics */
-      return <Search {...props} />;
+      return <MagnifyingGlassIcon {...props} />;
     case 1:
       /* Repair */
-      return <Wrench {...props} />;
+      return <GearIcon {...props} />;
     case 2:
       /* Service / maintenance */
-      return <Sparkles {...props} />;
+      return <MagicWandIcon {...props} />;
     default:
       /* Installation / hookup */
-      return <Plug {...props} />;
+      return <LightningBoltIcon {...props} />;
   }
 }
 
 export function serviceIconAccent(index: number): string {
-  switch (index % 4) {
-    case 0:
-      return "text-[color:var(--accent-cyan)]";
-    case 1:
-      return "text-[color:var(--accent-fuchsia)]";
-    case 2:
-      return "text-[color:var(--accent-amber)]";
-    default:
-      return "text-emerald-400";
-  }
+  void index;
+  return "text-[color:var(--accent)]";
 }

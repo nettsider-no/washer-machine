@@ -10,12 +10,12 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default: "",
-        cyan:
-          "border-[color:var(--accent-cyan-border)] bg-[color:var(--accent-cyan-bg)] text-[color:var(--accent-cyan)]",
-        fuchsia:
-          "border-[color:var(--accent-fuchsia-border)] bg-[color:var(--accent-fuchsia-bg)] text-[color:var(--accent-fuchsia)]",
-        amber:
-          "border-[color:var(--accent-amber-border)] bg-[color:var(--accent-amber-bg)] text-[color:var(--accent-amber)]",
+        accent:
+          "border-[color:var(--accent-border)] bg-[color:var(--accent-bg)] text-[color:var(--accent-ink)]",
+        warning:
+          "border-[color:var(--warning-border)] bg-[color:var(--warning-bg)] text-[color:var(--warning)]",
+        danger:
+          "border-[color:var(--danger-border)] bg-[color:var(--danger-bg)] text-[color:var(--danger)]",
       },
     },
     defaultVariants: {

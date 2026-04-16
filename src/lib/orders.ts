@@ -108,23 +108,23 @@ export function parseStaleCardOrderId(raw: string): string | null {
   return id;
 }
 
-export function orderKeyboard(orderId: string, _status: OrderStatus) {
+export function orderKeyboard(orderId: string) {
   return {
     inline_keyboard: [
-      [{ text: "🧰 Взять в работу", callback_data: cbCompact("t", orderId) }],
+      [{ text: "Взять в работу", callback_data: cbCompact("t", orderId) }],
       [
-        { text: "✅ Выполнено", callback_data: cbCompact("d", orderId) },
-        { text: "🚫 Отменить", callback_data: cbCompact("c", orderId) },
+        { text: "Выполнено", callback_data: cbCompact("d", orderId) },
+        { text: "Отменить", callback_data: cbCompact("c", orderId) },
       ],
     ],
   };
 }
 
 function statusLabel(status: OrderStatus) {
-  if (status === "new") return "🆕 <b>Новая</b>";
-  if (status === "in_progress") return "🔧 <b>В работе</b>";
-  if (status === "done") return "✅ <b>Выполнено</b>";
-  return "🚫 <b>Отменено</b>";
+  if (status === "new") return "<b>Новая</b>";
+  if (status === "in_progress") return "<b>В работе</b>";
+  if (status === "done") return "<b>Выполнено</b>";
+  return "<b>Отменено</b>";
 }
 
 function preferredLabel(v: OrderRow["preferred_window"]) {
@@ -143,39 +143,39 @@ function disp(raw: string | null | undefined): string {
 export function formatOrderHtml(o: OrderRow): string {
   const parts: string[] = [];
 
-  parts.push(`🛠️ <b>Заявка</b>  ${statusLabel(o.status)}`);
-  parts.push("━━━━━━━━━━━━━━━━━━━━");
+  parts.push(`<b>Заявка</b>  ${statusLabel(o.status)}`);
+  parts.push("--------------------");
 
-  parts.push(`👤 <b>Клиент:</b> ${disp(o.name)}`);
-  parts.push(`📞 <b>Телефон:</b> ${disp(o.phone)}`);
-  parts.push(`📍 <b>Адрес:</b> ${disp(o.address)}`);
-  parts.push(`🧺 <b>Марка:</b> ${disp(o.brand)}`);
-  parts.push(`🔎 <b>Модель:</b> ${disp(o.model)}`);
-  parts.push(`⚠️ <b>Код ошибки:</b> ${disp(o.error_code)}`);
+  parts.push(`<b>Клиент:</b> ${disp(o.name)}`);
+  parts.push(`<b>Телефон:</b> ${disp(o.phone)}`);
+  parts.push(`<b>Адрес:</b> ${disp(o.address)}`);
+  parts.push(`<b>Марка:</b> ${disp(o.brand)}`);
+  parts.push(`<b>Модель:</b> ${disp(o.model)}`);
+  parts.push(`<b>Код ошибки:</b> ${disp(o.error_code)}`);
 
-  parts.push("━━━━━━━━━━━━━━━━━━━━");
-  parts.push(`🧰 <b>Проблема:</b>\n${disp(o.issue)}`);
+  parts.push("--------------------");
+  parts.push(`<b>Проблема:</b>\n${disp(o.issue)}`);
 
-  parts.push("━━━━━━━━━━━━━━━━━━━━");
+  parts.push("--------------------");
   const hasSlot = Boolean(o.visit_date?.trim() && o.visit_time?.trim());
   if (hasSlot) {
     parts.push(
-      `🗓️ <b>Слот (Europe/Oslo):</b> ${escapeHtml(o.visit_date!)} ${escapeHtml(o.visit_time!)}`
+      `<b>Слот (Europe/Oslo):</b> ${escapeHtml(o.visit_date!)} ${escapeHtml(o.visit_time!)}`
     );
   } else if (o.preferred_window) {
-    parts.push(`🕒 <b>Когда удобно:</b> ${escapeHtml(preferredLabel(o.preferred_window))}`);
+    parts.push(`<b>Когда удобно:</b> ${escapeHtml(preferredLabel(o.preferred_window))}`);
   } else {
-    parts.push(`🕒 <b>Когда удобно:</b> не указано`);
+    parts.push(`<b>Когда удобно:</b> не указано`);
   }
   if (o.preferred_comment?.trim()) {
-    parts.push(`📝 <b>Комментарий к времени:</b> ${escapeHtml(o.preferred_comment.trim())}`);
+    parts.push(`<b>Комментарий к времени:</b> ${escapeHtml(o.preferred_comment.trim())}`);
   }
   if (o.visit_comment?.trim()) {
-    parts.push(`🗒️ <b>Детали мастера:</b> ${escapeHtml(o.visit_comment.trim())}`);
+    parts.push(`<b>Детали мастера:</b> ${escapeHtml(o.visit_comment.trim())}`);
   }
 
   parts.push("");
-  parts.push(`🆔 <code>${escapeHtml(o.id)}</code>`);
+  parts.push(`<code>${escapeHtml(o.id)}</code>`);
 
   return parts.join("\n");
 }

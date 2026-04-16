@@ -57,21 +57,30 @@ export async function sendTelegramHtml(html: string): Promise<{
   return { ok: tgRes.ok && !!json.ok, json, status: tgRes.status };
 }
 
-export async function telegramCall<T>(method: string, body: unknown): Promise<{
+export async function telegramCall<T extends Record<string, unknown> = Record<string, unknown>>(
+  method: string,
+  body: unknown
+): Promise<{
   ok: boolean;
-  json: any;
+  json: { ok?: boolean; description?: string } & T;
   status: number;
 }> {
   const { token } = getTelegramEnv();
-  if (!token) return { ok: false, json: { description: "not configured" }, status: 503 };
+  if (!token) {
+    return {
+      ok: false,
+      json: { description: "not configured" } as { ok?: boolean; description?: string } & T,
+      status: 503,
+    };
+  }
   const url = `https://api.telegram.org/bot${token}/${method}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  const json = (await res.json().catch(() => ({}))) as T;
-  return { ok: res.ok && !!(json as any)?.ok, json, status: res.status };
+  const json = (await res.json().catch(() => ({}))) as { ok?: boolean; description?: string } & T;
+  return { ok: res.ok && !!json.ok, json, status: res.status };
 }
 
 export async function sendTelegramMessage(params: {
@@ -82,7 +91,11 @@ export async function sendTelegramMessage(params: {
   link_preview_options?: { is_disabled?: boolean };
 }): Promise<{
   ok: boolean;
-  json: any;
+  json: {
+    ok?: boolean;
+    description?: string;
+    result?: { message_id?: number };
+  } & Record<string, unknown>;
   status: number;
 }> {
   return telegramCall("sendMessage", {
@@ -103,7 +116,7 @@ export async function editTelegramMessageText(params: {
   link_preview_options?: { is_disabled?: boolean };
 }): Promise<{
   ok: boolean;
-  json: any;
+  json: { ok?: boolean; description?: string; result?: unknown } & Record<string, unknown>;
   status: number;
 }> {
   return telegramCall("editMessageText", {

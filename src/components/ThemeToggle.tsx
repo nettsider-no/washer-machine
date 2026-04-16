@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Laptop, Moon, Sun } from "lucide-react";
+import { LaptopIcon, MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
 
 type Theme = "light" | "dark" | "system";
@@ -11,9 +11,9 @@ const options: Array<{
   label: string;
   Icon: React.ComponentType<{ className?: string }>;
 }> = [
-  { value: "system", label: "Auto", Icon: Laptop },
-  { value: "light", label: "Light", Icon: Sun },
-  { value: "dark", label: "Dark", Icon: Moon },
+  { value: "system", label: "Auto", Icon: LaptopIcon },
+  { value: "light", label: "Light", Icon: SunIcon },
+  { value: "dark", label: "Dark", Icon: MoonIcon },
 ];
 
 function isTheme(v: unknown): v is Theme {
@@ -77,8 +77,8 @@ export function ThemeToggle({ className }: { className?: string }) {
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition-all duration-200 sm:px-3",
               active
-                ? "bg-gradient-to-r from-cyan-500/25 to-fuchsia-500/25 text-[var(--foreground)] shadow-[0_0_18px_rgba(34,211,238,0.18)]"
-                : "text-[var(--muted)] hover:bg-white/10 hover:text-[var(--foreground)]"
+                ? "bg-[color:var(--accent-bg)] text-[var(--foreground)] shadow-[0_16px_48px_-28px_rgba(2,6,23,0.55)]"
+                : "text-[var(--muted)] hover:bg-[color:var(--surface-hover)] hover:text-[var(--foreground)]"
             )}
             aria-pressed={active}
           >

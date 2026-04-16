@@ -83,7 +83,7 @@ export function ContactForm() {
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-cyan-500/40 placeholder:text-[color:var(--field-placeholder)] focus:border-cyan-500/50 focus:ring-2"
+          className="w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-[color:var(--focus-ring)] placeholder:text-[color:var(--field-placeholder)] focus:border-[color:var(--accent-border)] focus:ring-2"
         />
       </div>
       <div>
@@ -96,7 +96,7 @@ export function ContactForm() {
           required
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-cyan-500/40 focus:border-cyan-500/50 focus:ring-2"
+          className="w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-[color:var(--focus-ring)] focus:border-[color:var(--accent-border)] focus:ring-2"
         />
       </div>
       <div>
@@ -108,7 +108,7 @@ export function ContactForm() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-cyan-500/40 focus:border-cyan-500/50 focus:ring-2"
+          className="w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-[color:var(--focus-ring)] focus:border-[color:var(--accent-border)] focus:ring-2"
         />
       </div>
       <div>
@@ -119,7 +119,7 @@ export function ContactForm() {
           id="cf-city"
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          className="w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-cyan-500/40 focus:border-cyan-500/50 focus:ring-2"
+          className="w-full rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-[color:var(--focus-ring)] focus:border-[color:var(--accent-border)] focus:ring-2"
         />
       </div>
       <div>
@@ -135,22 +135,22 @@ export function ContactForm() {
           rows={4}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="w-full resize-y rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-cyan-500/40 focus:border-cyan-500/50 focus:ring-2"
+          className="w-full resize-y rounded-lg border border-[var(--border)] bg-[color:var(--field)] px-3 py-2.5 text-[var(--foreground)] outline-none ring-[color:var(--focus-ring)] focus:border-[color:var(--accent-border)] focus:ring-2"
         />
       </div>
       {status === "validate" && (
-        <p className="text-sm text-amber-400">{t.formRequired}</p>
+        <p className="text-sm text-[color:var(--warning)]">{t.formRequired}</p>
       )}
       {status === "err" && (
-        <p className="text-sm text-amber-400">{t.formError}</p>
+        <p className="text-sm text-[color:var(--danger)]">{t.formError}</p>
       )}
       {status === "ok" && (
-        <p className="text-sm text-cyan-300">{t.formSuccess}</p>
+        <p className="text-sm text-[color:var(--accent-ink)]">{t.formSuccess}</p>
       )}
       <button
         type="submit"
         disabled={status === "sending"}
-        className="rounded-xl bg-gradient-to-r from-cyan-600 to-fuchsia-600 px-5 py-3 font-semibold text-white shadow-[0_0_28px_rgba(34,211,238,0.25)] transition hover:brightness-110 disabled:opacity-60"
+        className="rounded-xl bg-[color:var(--accent)] px-5 py-3 font-semibold text-white shadow-[0_18px_40px_-18px_rgba(2,6,23,0.55)] transition hover:brightness-[1.05] active:translate-y-px active:scale-[0.98] disabled:opacity-60"
       >
         {status === "sending" ? t.formSending : t.formSubmit}
       </button>
