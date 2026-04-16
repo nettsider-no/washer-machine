@@ -7,51 +7,56 @@ export function LogoMark({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
     >
-      {/* Outer squircle */}
-      <rect
-        x="5.5"
-        y="5.5"
-        width="21"
-        height="21"
-        rx="7"
+      {/* Hex badge (distinct silhouette) */}
+      <path
+        d="M16 4.8 26.2 10.7V21.3L16 27.2 5.8 21.3V10.7L16 4.8Z"
+        fill="transparent"
         stroke="var(--hero-line)"
-        strokeWidth="1.4"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
       />
 
-      {/* Dial ring */}
+      {/* Washer door ring */}
       <circle
-        cx="16"
+        cx="14.7"
         cy="16.2"
-        r="7.1"
+        r="6.2"
         stroke="var(--hero-line)"
         strokeWidth="1.4"
       />
       <circle
-        cx="16"
+        cx="14.7"
         cy="16.2"
-        r="4.6"
+        r="3.9"
         stroke="var(--hero-line)"
-        strokeOpacity="0.65"
+        strokeOpacity="0.6"
         strokeWidth="1.2"
       />
 
-      {/* Accent arc (service signal) */}
+      {/* Accent wave */}
       <path
-        d="M12.2 18.4c1.2-1.6 3.4-2.2 5.2-1.2 1.9 1 3.4.8 4.4-.4"
+        d="M10.6 17.2c1.3-1.2 3-1.2 4.3 0s3 1.2 4.3 0"
         stroke="var(--accent)"
-        strokeOpacity="0.7"
+        strokeOpacity="0.75"
         strokeWidth="1.7"
         strokeLinecap="round"
       />
 
-      {/* Small notch + dot */}
+      {/* Minimal tool mark (wrench-like) */}
       <path
-        d="M16 7.9v2.1"
-        stroke="var(--hero-line)"
-        strokeWidth="1.4"
+        d="M19.2 12.3l4.2 4.2"
+        stroke="var(--accent)"
+        strokeOpacity="0.8"
+        strokeWidth="1.8"
         strokeLinecap="round"
       />
-      <circle cx="22.9" cy="10.7" r="1.1" fill="var(--accent)" fillOpacity="0.75" />
+      <path
+        d="M23.8 17.3c.7-.7.7-1.8 0-2.5-.7-.7-1.8-.7-2.5 0"
+        stroke="var(--accent)"
+        strokeOpacity="0.55"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
