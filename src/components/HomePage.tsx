@@ -1,6 +1,7 @@
 "use client";
 
 import { Header } from "./Header";
+import { BrandMarquee } from "./BrandMarquee";
 import { HeroVisual } from "./HeroVisual";
 import { RepairRequestForm } from "./RepairRequestForm";
 import { ServiceIcon, serviceIconAccent } from "./ServiceIcon";
@@ -38,6 +39,8 @@ export function HomePage() {
               </div>
             </div>
           </div>
+
+          <BrandMarquee className="mt-14" />
         </section>
 
         <section
