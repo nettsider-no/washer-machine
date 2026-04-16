@@ -5,6 +5,7 @@ import { BrandMarquee } from "./BrandMarquee";
 import { HeroVisual } from "./HeroVisual";
 import { RepairRequestForm } from "./RepairRequestForm";
 import { ServiceIcon, serviceIconAccent } from "./ServiceIcon";
+import { ServiceAreaSection } from "./ServiceAreaSection";
 import { useLocale } from "./LocaleProvider";
 
 export function HomePage() {
@@ -76,6 +77,15 @@ export function HomePage() {
             </ul>
           </div>
         </section>
+
+        <ServiceAreaSection
+          title={t.areaTitle}
+          lead={t.areaLead}
+          bullets={t.areaBullets}
+          mapCaption={t.areaMapCaption}
+          primaryLabel={t.areaPrimaryLabel}
+          secondaryLabel={t.areaSecondaryLabel}
+        />
 
         <section
           id="request"

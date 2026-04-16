@@ -43,6 +43,12 @@ export type Messages = {
   servicesTitle: string;
   servicesIntro: string;
   services: { title: string; text: string }[];
+  areaTitle: string;
+  areaLead: string;
+  areaBullets: string[];
+  areaMapCaption: string;
+  areaPrimaryLabel: string;
+  areaSecondaryLabel: string;
   requestTitle: string;
   requestLead: string;
   requestFormTitle: string;
@@ -132,6 +138,18 @@ export const messages: Record<Locale, Messages> = {
         text: "Korrekt tilkobling til vann og avløp, nivellering og testkjøring etter montering.",
       },
     ],
+    areaTitle: "Dekningsområde",
+    areaLead:
+      "Vi jobber primært i Oslo og nærliggende områder. Hvis du er litt utenfor sonen, send en forespørsel — ofte kan vi likevel finne en løsning.",
+    areaBullets: [
+      "Oslo og regionen rundt (utrykning etter avtale).",
+      "Typisk responstid: samme dag eller neste virkedag, avhengig av kapasitet.",
+      "Vi avtaler tidspunkt på forhånd. Du får et bekreftet tidsvindu.",
+      "Transportsone kan påvirke pris — vi sier alltid ifra før vi starter.",
+    ],
+    areaMapCaption: "Serviceområde (forenklet kart)",
+    areaPrimaryLabel: "Oslo + region",
+    areaSecondaryLabel: "Utenfor sonen: spør",
     requestTitle: "Bestill reparasjon",
     requestLead:
       "Fyll ut skjemaet — vi sender detaljene direkte til mesteren. Jo mer presist, jo raskere og enklere blir det å hjelpe.",
@@ -230,6 +248,18 @@ export const messages: Record<Locale, Messages> = {
         text: "Правильное подключение к воде и канализации, выравнивание, пробный запуск.",
       },
     ],
+    areaTitle: "Зона обслуживания",
+    areaLead:
+      "Основная зона — Осло и ближайший регион. Если вы немного дальше, всё равно оставьте заявку: часто можно договориться.",
+    areaBullets: [
+      "Осло и регион рядом (выезд по согласованию).",
+      "Обычно отвечаем в тот же день или на следующий рабочий — по загрузке.",
+      "Время визита подтверждаем заранее, приезжаем в согласованное окно.",
+      "Дальность может влиять на стоимость — всегда предупреждаем до начала работ.",
+    ],
+    areaMapCaption: "Зона выезда (схематичная карта)",
+    areaPrimaryLabel: "Осло + регион",
+    areaSecondaryLabel: "Вне зоны: уточнить",
     requestTitle: "Запись на ремонт",
     requestLead:
       "Заполните форму — данные уйдут мастеру сразу в Telegram. Чем точнее описание, тем быстрее диагностика и выезд.",
@@ -329,6 +359,18 @@ export const messages: Record<Locale, Messages> = {
         text: "Correct water and drain hookup, levelling, and a test run after setup.",
       },
     ],
+    areaTitle: "Service area",
+    areaLead:
+      "We mainly serve Oslo and nearby areas. If you’re slightly outside the zone, send a request — we can often make it work.",
+    areaBullets: [
+      "Oslo and surrounding region (visit by appointment).",
+      "Typical response: same day or next business day, depending on workload.",
+      "We confirm a time window in advance — no surprise visits.",
+      "Travel distance can affect the price — we always confirm before any work starts.",
+    ],
+    areaMapCaption: "Service coverage (simplified map)",
+    areaPrimaryLabel: "Oslo + region",
+    areaSecondaryLabel: "Outside zone: ask",
     requestTitle: "Book a repair",
     requestLead:
       "Fill in the form — details go straight to the technician in Telegram. The clearer the request, the faster the diagnosis and visit.",
