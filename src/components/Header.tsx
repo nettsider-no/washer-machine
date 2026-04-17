@@ -16,8 +16,16 @@ export function Header() {
           href="#top"
           className="group flex items-center gap-2 font-[family-name:var(--font-display)] text-sm font-semibold tracking-tight text-[var(--foreground)] transition-colors duration-200 hover:text-[color:var(--accent-ink)] active:translate-y-px active:scale-[0.98] sm:text-base"
         >
-          <span className="flex h-10 w-10 items-center justify-center">
-            <Image src="/logo.png" alt="WM Service" width={40} height={40} priority />
+          <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
+            <Image
+              src="/logo.png"
+              alt="WM Service"
+              width={48}
+              height={48}
+              priority
+              className="h-full w-full object-cover object-center"
+              sizes="48px"
+            />
           </span>
           <span>
             WM
